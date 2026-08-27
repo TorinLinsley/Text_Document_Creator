@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Text_Document_Creator/Text_Document_Creator.vcxproj" Id="23c94c3f-3fc5-4cb9-858d-4a4dbc990d32" />
+</Solution>
