@@ -14,4 +14,4 @@ After launching, press the corresponding shortcut key to perform the correspondi
 
 [**Windows**]+[**F**] - **Create new text document**
 
-[**Windows**]+[**J**] - **Open notepad**
+[**Windows**]+[**S**] - **Open notepad**
