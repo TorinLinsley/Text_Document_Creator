@@ -1,0 +1,2 @@
+# Text_Document_Creator
+一个可以用快捷键快速创建新建文本文档的自制小工具。
