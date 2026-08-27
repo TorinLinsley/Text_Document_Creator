@@ -1,5 +1,5 @@
 # Text Document Creator
-English [Simplified Chinese](README.md)
+English [简体中文](README.md)
 
 A homemade little tool that can quickly create a new text file using keyboard shortcuts.
 
