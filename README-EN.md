@@ -9,3 +9,6 @@ Keyboard shortcuts have been assigned for creating a new text file and for openi
 > This application runs exclusively in the system tray.
 
 After launching, pressing the appropriate keyboard shortcut will execute the associated operation. Shortcuts can be customized in the software settings.
+
+## Notes
+- Holding down the shortcut will repeatedly trigger the action, creating many new text files and opening multiple Notepad windows.
