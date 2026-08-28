@@ -6,12 +6,8 @@ A homemade little tool that can quickly create a new text file using keyboard sh
 Keyboard shortcuts have been assigned for creating a new text file and for opening the built-in Notepad, so that text files can be created quickly.
 
 ## Usage
-> The software currently runs only in the system tray. It can be set to start automatically on boot.
+> This application runs exclusively in the system tray.
 
-After launching, press the corresponding shortcut key to perform the corresponding action.
+Upon startup, pressing the appropriate keyboard shortcut will execute the associated operation.
 
-#
-
-[**Windows**]+[**F**] - **Create new text document**
-
-[**Windows**]+[**S**] - **Open notepad**
+If you are using version 1.1.0 or newer, shortcut customization is available within the application settings.
