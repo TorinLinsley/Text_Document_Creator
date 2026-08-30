@@ -10,5 +10,10 @@ Keyboard shortcuts have been assigned for creating a new text file and for openi
 
 After launching, pressing the appropriate keyboard shortcut will execute the associated operation. Shortcuts can be customized in the software settings.
 
+### Default Hotkey (v1.1.0)
+[**Ctrl**]+[**Shift**]+[**空格**] > Create text file
+
+[**Ctrl**]+[**Shift**]+[**F**] > Open notepad
+
 ## Notes
 - Holding down the shortcut will repeatedly trigger the action, creating many new text files and opening multiple Notepad windows.
