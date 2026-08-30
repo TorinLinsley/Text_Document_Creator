@@ -16,4 +16,4 @@ After launching, pressing the appropriate keyboard shortcut will execute the ass
 [**Ctrl**]+[**Shift**]+[**F**] > Open notepad
 
 ## Notes
-- Holding down the shortcut will repeatedly trigger the action, creating many new text files and opening multiple Notepad windows.
+- Holding down the shortcut will repeatedly trigger the action, creating many new text files or opening multiple Notepad windows.
