@@ -12,7 +12,7 @@ Keyboard shortcuts have been assigned for creating a new text file and for openi
 After launching, pressing the appropriate keyboard shortcut will execute the associated operation. Shortcuts can be customized in the software settings. (Besides Ctrl+Alt+V and Ctrl+Shift+V, shortcuts that include the Windows key also cannot be bound.)
 
 ### Default Hotkey (v1.1.0)
-[**Ctrl**]+[**Shift**]+[**空格**] > Create text file
+[**Ctrl**]+[**Shift**]+[**Space**] > Create text file
 
 [**Ctrl**]+[**Shift**]+[**F**] > Open notepad
 
