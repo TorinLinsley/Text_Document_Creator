@@ -2,7 +2,7 @@
 
 English | [简体中文](README.md) | [繁体中文](README-HK.md)
 
-A Windows tray utility remade with Rust (v2.0.0): a global hotkey creates a new text document in the currently focused Explorer folder (or on the desktop), and another hotkey opens Notepad.
+A Windows tray utility remade with Rust: a global hotkey creates a new text document in the currently focused Explorer folder (or on the desktop), and another hotkey opens Notepad.
 
 The settings window is not assembled from stock controls but drawn from scratch: borderless, rounded, soft shadows, Auto/Light/Dark themes and 20 UI languages, all rendered with plain GDI. The whole program depends only on DLLs that ship with Windows.
 
@@ -24,7 +24,7 @@ The settings window is not assembled from stock controls but drawn from scratch:
 3. Press `Win+J`: opens Notepad in a new window every time, so several can be opened at once; about 0.15 s from key press to window
 4. Left click the tray icon to open the settings: toggle features, bind shortcuts, switch language and theme, or read About
 
-### Default hotkeys (v2.0.0)
+### Default hotkeys
 
 | Action | Default hotkey |
 | --- | --- |
