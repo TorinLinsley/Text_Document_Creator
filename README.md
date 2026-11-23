@@ -132,9 +132,3 @@ cargo build --release
 
 - 一直按住快捷键会持续触发（120ms 节流），可连续创建多个文件或打开多个记事本窗口
 - 创建文件失败时不弹错误框，避免打断当前操作
-
-## 版权
-
-- 版权：Torin Linsley
-- 开源协议：LGPL v2.1
-- 项目链接：https://github.com/TorinLinsley/Text_Document_Creator

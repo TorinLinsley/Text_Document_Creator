@@ -132,9 +132,3 @@ Output: `target\release\text_document_creator.exe`
 
 - Holding a shortcut keeps triggering it with a 120 ms throttle, creating several files or opening several Notepad windows
 - A failed file creation is reported in the UI without an error dialog, so the current work is not interrupted
-
-## License
-
-- Copyright: Torin Linsley
-- License: LGPL v2.1
-- Project: https://github.com/TorinLinsley/Text_Document_Creator

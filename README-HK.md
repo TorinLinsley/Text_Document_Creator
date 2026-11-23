@@ -132,9 +132,3 @@ cargo build --release
 
 - 一直按住快速鍵會持續觸發（120ms 節流），可連續建立多個檔案或開啟多個記事本視窗
 - 建立檔案失敗時不彈錯誤框，避免打斷目前操作
-
-## 版權
-
-- 版權：Torin Linsley
-- 開源授權：LGPL v2.1
-- 專案連結：https://github.com/TorinLinsley/Text_Document_Creator
