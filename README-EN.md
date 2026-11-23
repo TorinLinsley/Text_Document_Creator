@@ -50,6 +50,12 @@ This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `
 
 ## Shortcuts
 
+- Modifiers: `Ctrl`, `Shift`, `Alt`, `Win`, either side of the keyboard, in any combination
+- Keys: A-Z, 0-9, `F1`-`F24`, numpad `Num0`-`Num9` plus `Num*` `Num+` `Num-` `Num.` `Num/`, arrow keys, `Home`/`End`/`PageUp`/`PageDown`/`Insert`/`Delete`, `Space`/`Tab`/`Enter`/`Backspace`/`Esc`, symbol keys and media keys
+- Focus a shortcut field and press the desired combination to bind it; `Esc` cancels. Clear empties the row, Reset restores its default and Reset all restores every default
+- The global hook runs on its own TIME_CRITICAL thread with priority above the system and other applications; a matched combination is swallowed and no `Win` state is left behind (no accidental Start menu or system search)
+- Holding `Win` while binding another key no longer pops up the Start menu
+
 ### Default hotkeys
 
 | Action | Default hotkey |
@@ -58,12 +64,6 @@ This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `
 | Open Notepad | `Win+J` |
 | Toggle - create | Not set |
 | Toggle - notepad | Not set |
-
-- Modifiers: `Ctrl`, `Shift`, `Alt`, `Win`, either side of the keyboard, in any combination
-- Keys: A-Z, 0-9, `F1`-`F24`, numpad `Num0`-`Num9` plus `Num*` `Num+` `Num-` `Num.` `Num/`, arrow keys, `Home`/`End`/`PageUp`/`PageDown`/`Insert`/`Delete`, `Space`/`Tab`/`Enter`/`Backspace`/`Esc`, symbol keys and media keys
-- Focus a shortcut field and press the desired combination to bind it; `Esc` cancels. Clear empties the row, Reset restores its default and Reset all restores every default
-- The global hook runs on its own TIME_CRITICAL thread with priority above the system and other applications; a matched combination is swallowed and no `Win` state is left behind (no accidental Start menu or system search)
-- Holding `Win` while binding another key no longer pops up the Start menu
 
 ## Settings
 
