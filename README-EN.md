@@ -6,16 +6,29 @@ A Windows tray utility remade with Rust: a global hotkey creates a new text docu
 
 The settings window is not assembled from stock controls but drawn from scratch: borderless, rounded, soft shadows, Auto/Light/Dark themes and 20 UI languages, all rendered with plain GDI. The whole program depends only on DLLs that ship with Windows.
 
-## Features
+## Download and install
 
-- **Single exe**: statically linked CRT, only depends on `user32` / `gdi32` / `dwmapi` / `shell32` / `advapi32` / `uxtheme` / `ole32`, so it runs from any Windows 10/11 machine as-is
-- **Single process**: no child processes and no host process; one entry in both the Processes and Details tabs of Task Manager, with a display name that follows the system language
-- **Global hotkeys**: `Win+F` creates a text document and `Win+J` opens Notepad by default; combinations that include `Win` are overridden as well
-- **Tray resident**: starts silently in the tray without showing a window; left click opens the settings, right click shows Settings / Run at startup / Exit
-- **Modern UI**: hover, press, dropdown, toggle and theme transitions are all animated and interruptible
-- **20 UI languages**: follows the Windows system language on startup, the dropdown scrolls with the wheel and a manual choice is remembered
-- **High DPI aware**: Per-Monitor V2, crisp text at 125% / 150%, live reflow when scaling or resolution changes
-- **Lightweight**: about 455 KB exe; sitting in the tray with no settings window open and nothing happening costs about **80 KB** of private working set, and about 2.5 MB private memory once the settings window is open
+### Download the exe
+
+1. Open [Releases](https://github.com/TorinLinsley/Text_Document_Creator/releases) and download the latest `text_document_creator.exe`
+2. Put it in any folder (for example `D:\Tools\TextDocumentCreator`) and double click it
+3. Nothing to install, no .NET or VC++ runtime required; deleting the exe uninstalls the app
+
+### Build from source
+
+```
+git clone https://github.com/TorinLinsley/Text_Document_Creator.git
+cd Text_Document_Creator
+cargo build --release
+```
+
+This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `target\release\text_document_creator.exe`.
+
+### First run
+
+- No window appears on startup: the icon simply shows up in the tray, and a left click opens the settings
+- Enable "Run at startup" in the settings or the tray menu when needed
+- To uninstall completely, choose Exit in the tray menu and delete the exe; to remove the settings as well, delete the registry key `HKEY_CURRENT_USER\Software\TextDocumentCreator` and `Text_Document_Creator` under `Run`
 
 ## Usage
 
@@ -32,6 +45,17 @@ The settings window is not assembled from stock controls but drawn from scratch:
 | Open Notepad | `Win+J` |
 | Toggle - create | Not set |
 | Toggle - notepad | Not set |
+
+## Features
+
+- **Single exe**: statically linked CRT, only depends on `user32` / `gdi32` / `dwmapi` / `shell32` / `advapi32` / `uxtheme` / `ole32`, so it runs from any Windows 10/11 machine as-is
+- **Single process**: no child processes and no host process; one entry in both the Processes and Details tabs of Task Manager, with a display name that follows the system language
+- **Global hotkeys**: `Win+F` creates a text document and `Win+J` opens Notepad by default; combinations that include `Win` are overridden as well
+- **Tray resident**: starts silently in the tray without showing a window; left click opens the settings, right click shows Settings / Run at startup / Exit
+- **Modern UI**: hover, press, dropdown, toggle and theme transitions are all animated and interruptible
+- **20 UI languages**: follows the Windows system language on startup, the dropdown scrolls with the wheel and a manual choice is remembered
+- **High DPI aware**: Per-Monitor V2, crisp text at 125% / 150%, live reflow when scaling or resolution changes
+- **Lightweight**: about 455 KB exe; sitting in the tray with no settings window open and nothing happening costs about **80 KB** of private working set, and about 2.5 MB private memory once the settings window is open
 
 ## Shortcuts
 
