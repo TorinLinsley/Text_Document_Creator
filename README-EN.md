@@ -108,7 +108,7 @@ The program is one Win32 window, one tray icon and one global hook. It spawns no
 - File creation resolves the foreground window: the desktop (`Progman` / `WorkerW`) maps to the desktop folder, Explorer windows are matched by `HWND` through `IShellWindows` to read their current path, and the desktop is the fallback
 - Notepad is launched with `CreateProcessW` on `%SystemRoot%\System32\notepad.exe` with an empty working directory (so the Store build still finds its DLLs), then the new process window is found with `EnumWindows` and brought to the front
 
-## Internationalisation
+## Languages
 
 - 20 languages: Simplified Chinese, Traditional Chinese, English (US), English (UK), Japanese, Korean, French, German, Spanish, Italian, Russian, Portuguese (BR), Polish, Dutch, Turkish, Ukrainian, Vietnamese, Indonesian, Thai and Hindi
 - On startup `GetUserDefaultLocaleName` decides the locale (`zh-CN` and similar map to Simplified Chinese, `zh-TW`/`zh-HK`/`zh-MO` to Traditional), with `GetUserDefaultUILanguage` as the fallback; picking a language manually writes `LanguageAuto=0` so the system language no longer overrides it

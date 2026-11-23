@@ -108,7 +108,7 @@ cargo build --release
 - 建文件时取前台窗口的 `HWND`：桌面（`Progman` / `WorkerW`）落到桌面目录，资源管理器窗口通过 `IShellWindows` 枚举匹配 `HWND` 并读取当前路径，取不到才回退桌面
 - 打开记事本用 `CreateProcessW` 启动 `%SystemRoot%\System32\notepad.exe`（工作目录留空，避免商店版记事本找不到依赖 DLL），再短暂等待并用 `EnumWindows` 找到本次进程的窗口置前
 
-## 国际化
+## 语言
 
 - 20 种语言：简体中文、繁體中文、English (US)、English (UK)、日本語、한국어、Français、Deutsch、Español、Italiano、Русский、Português (BR)、Polski、Nederlands、Türkçe、Українська、Tiếng Việt、Bahasa Indonesia、ไทย、हिन्दी
 - 启动时用 `GetUserDefaultLocaleName` 判断系统区域（`zh-CN` 等 → 简体中文，`zh-TW`/`zh-HK`/`zh-MO` → 繁體），再回退到 `GetUserDefaultUILanguage`；手动选择过语言后写入 `LanguageAuto=0`，之后不再被系统语言覆盖

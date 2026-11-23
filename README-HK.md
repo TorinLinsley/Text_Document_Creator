@@ -108,7 +108,7 @@ cargo build --release
 - 建檔案時取前景視窗的 `HWND`：桌面（`Progman` / `WorkerW`）落到桌面目錄，檔案總管視窗透過 `IShellWindows` 列舉比對 `HWND` 並讀取目前路徑，取不到才回退桌面
 - 開啟記事本用 `CreateProcessW` 啟動 `%SystemRoot%\System32\notepad.exe`（工作目錄留空，避免商店版記事本找不到相依 DLL），再短暫等待並用 `EnumWindows` 找到本次處理序的視窗置前
 
-## 國際化
+## 語言
 
 - 20 種語言：簡體中文、繁體中文、English (US)、English (UK)、日本語、한국어、Français、Deutsch、Español、Italiano、Русский、Português (BR)、Polski、Nederlands、Türkçe、Українська、Tiếng Việt、Bahasa Indonesia、ไทย、हिन्दी
 - 啟動時用 `GetUserDefaultLocaleName` 判斷系統區域（`zh-CN` 等 → 簡體中文，`zh-TW`/`zh-HK`/`zh-MO` → 繁體），再回退到 `GetUserDefaultUILanguage`；手動選擇過語言後寫入 `LanguageAuto=0`，之後不再被系統語言覆蓋
