@@ -37,15 +37,6 @@ This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `
 3. Press `Win+J`: opens Notepad in a new window every time, so several can be opened at once; about 0.15 s from key press to window
 4. Left click the tray icon to open the settings: toggle features, bind shortcuts, switch language and theme, or read About
 
-### Default hotkeys
-
-| Action | Default hotkey |
-| --- | --- |
-| Create text file | `Win+F` |
-| Open Notepad | `Win+J` |
-| Toggle - create | Not set |
-| Toggle - notepad | Not set |
-
 ## Features
 
 - **Single exe**: statically linked CRT, only depends on `user32` / `gdi32` / `dwmapi` / `shell32` / `advapi32` / `uxtheme` / `ole32`, so it runs from any Windows 10/11 machine as-is
@@ -58,6 +49,15 @@ This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `
 - **Lightweight**: about 455 KB exe; sitting in the tray with no settings window open and nothing happening costs about **80 KB** of private working set, and about 2.5 MB private memory once the settings window is open
 
 ## Shortcuts
+
+### Default hotkeys
+
+| Action | Default hotkey |
+| --- | --- |
+| Create text file | `Win+F` |
+| Open Notepad | `Win+J` |
+| Toggle - create | Not set |
+| Toggle - notepad | Not set |
 
 - Modifiers: `Ctrl`, `Shift`, `Alt`, `Win`, either side of the keyboard, in any combination
 - Keys: A-Z, 0-9, `F1`-`F24`, numpad `Num0`-`Num9` plus `Num*` `Num+` `Num-` `Num.` `Num/`, arrow keys, `Home`/`End`/`PageUp`/`PageDown`/`Insert`/`Delete`, `Space`/`Tab`/`Enter`/`Backspace`/`Esc`, symbol keys and media keys
