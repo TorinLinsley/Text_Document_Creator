@@ -22,7 +22,7 @@ The settings window is not assembled from stock controls but drawn from scratch:
 1. Double click to run; the app stays in the tray and shows no window on startup
 2. Press `Win+F`: creates `新建文本文档.txt` in the **currently focused Explorer folder**, or `新建文本文档_1.txt`, `_2`... when it already exists; when the desktop is focused the file is created there
 3. Press `Win+J`: opens Notepad in a new window every time, so several can be opened at once; about 0.15 s from key press to window
-4. Left click the tray icon to open the settings: toggle features, record shortcuts, switch language and theme, or read About
+4. Left click the tray icon to open the settings: toggle features, bind shortcuts, switch language and theme, or read About
 
 ### Default hotkeys (v2.0.0)
 
@@ -37,14 +37,14 @@ The settings window is not assembled from stock controls but drawn from scratch:
 
 - Modifiers: `Ctrl`, `Shift`, `Alt`, `Win`, either side of the keyboard, in any combination
 - Keys: A-Z, 0-9, `F1`-`F24`, numpad `Num0`-`Num9` plus `Num*` `Num+` `Num-` `Num.` `Num/`, arrow keys, `Home`/`End`/`PageUp`/`PageDown`/`Insert`/`Delete`, `Space`/`Tab`/`Enter`/`Backspace`/`Esc`, symbol keys and media keys
-- Focus a shortcut field and press the desired combination to record it; `Esc` cancels. Clear empties the row, Reset restores its default and Reset all restores every default
+- Focus a shortcut field and press the desired combination to bind it; `Esc` cancels. Clear empties the row, Reset restores its default and Reset all restores every default
 - The global hook runs on its own TIME_CRITICAL thread with priority above the system and other applications; a matched combination is swallowed and no `Win` state is left behind (no accidental Start menu or system search)
-- Holding `Win` while recording another key no longer pops up the Start menu
+- Holding `Win` while binding another key no longer pops up the Start menu
 
 ## Settings
 
 - **Features**: create text file, open Notepad, run at startup (kept in sync with the tray menu in both directions)
-- **Shortcuts**: four recordable rows, per-row clear and reset, plus reset all
+- **Shortcuts**: four bindable rows, per-row clear and reset, plus reset all
 - **Language**: 20 languages in the dropdown, scrollable and switchable with the arrow keys while focused
 - **Theme**: Auto / Light / Dark, with Auto following the system theme live
 
@@ -120,7 +120,7 @@ Output: `target\release\text_document_creator.exe`
 | `src/anim.rs` | Exponential-approach animation |
 | `src/i18n.rs` | Text for 20 languages and system language detection |
 | `src/config.rs` | Registry persistence and run-at-startup registration |
-| `src/hotkey.rs` | Global hook, key recording, file creation and Notepad launch |
+| `src/hotkey.rs` | Global hook, key binding, file creation and Notepad launch |
 | `src/ffi.rs` / `src/sys.rs` | Win32 constants and API declarations |
 
 ## Data locations
