@@ -48,14 +48,6 @@ The settings window is not assembled from stock controls but drawn from scratch:
 - **Language**: 20 languages in the dropdown, scrollable and switchable with the arrow keys while focused
 - **Theme**: Auto / Light / Dark, with Auto following the system theme live
 
-## Screenshots
-
-![Settings](docs/preview.png)
-
-![Language list](docs/preview-langs.png)
-
-![About page](docs/preview-about.png)
-
 ## Architecture
 
 The program is one Win32 window, one tray icon and one global hook. It spawns no child process and keeps no helper thread; actions triggered by a hotkey run on a short-lived thread that exits when done.
