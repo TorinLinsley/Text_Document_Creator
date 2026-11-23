@@ -27,7 +27,7 @@ The settings window is not assembled from stock controls but drawn from scratch:
 
 ### Build from source
 
-```
+```cmd
 git clone https://github.com/TorinLinsley/Text_Document_Creator.git
 cd Text_Document_Creator
 cargo build --release

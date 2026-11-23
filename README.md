@@ -27,7 +27,7 @@
 
 ### 自行编译
 
-```
+```cmd
 git clone https://github.com/TorinLinsley/Text_Document_Creator.git
 cd Text_Document_Creator
 cargo build --release
