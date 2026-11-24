@@ -39,7 +39,7 @@ impl Settings {
     pub fn defaults() -> Settings {
         Settings {
             enable_create: true,
-            enable_notepad: true,
+            enable_notepad: false,
             autostart: false,
             vk_create: 0x46,
             mod_create: MOD_WIN,
@@ -58,7 +58,7 @@ impl Settings {
     pub fn load() -> Settings {
         let mut s = Settings::defaults();
         s.enable_create = read_dword("EnableCreate", 1) != 0;
-        s.enable_notepad = read_dword("EnableNotepad", 1) != 0;
+        s.enable_notepad = read_dword("EnableNotepad", 0) != 0;
         s.autostart = autostart_registered();
         s.vk_create = read_dword("VkCreate", s.vk_create);
         s.mod_create = read_dword("ModCreate", s.mod_create);
