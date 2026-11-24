@@ -806,9 +806,33 @@ impl App {
             return false;
         }
         self.set_language(next as usize);
+        self.ensure_lang_visible(next as usize);
         self.request_anim();
         self.invalidate();
         true
+    }
+
+    fn ensure_lang_visible(&mut self, index: usize) {
+        let l = self.layout();
+        let row_top = 8.0 + index as f32 * 40.0;
+        let row_bottom = row_top + 40.0;
+        let mut target = self.lang_scroll_target;
+        if row_top - 6.0 < target {
+            target = row_top - 6.0;
+        }
+        if row_bottom + 6.0 > target + l.list.h {
+            target = row_bottom + 6.0 - l.list.h;
+        }
+        if target < 0.0 {
+            target = 0.0;
+        }
+        if target > l.list_max_scroll {
+            target = l.list_max_scroll;
+        }
+        if (target - self.lang_scroll_target).abs() > 0.5 {
+            self.lang_scroll_target = target;
+            self.lang_scroll.to(target);
+        }
     }
 
     pub fn shortcut_index(&self, i: usize) -> (u32, u32) {
@@ -864,6 +888,9 @@ impl App {
             self.lang_focus = true;
             self.dropdown_open = !self.dropdown_open;
             self.dropdown_anim.to(if self.dropdown_open { 1.0 } else { 0.0 });
+            if self.dropdown_open {
+                self.ensure_lang_visible(self.lang);
+            }
             self.request_anim();
             self.invalidate();
             return;
