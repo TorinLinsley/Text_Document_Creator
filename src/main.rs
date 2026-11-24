@@ -519,6 +519,12 @@ unsafe extern "system" fn wnd_proc(hwnd: HWND, msg: u32, wp: WPARAM, lp: LPARAM)
             }
             0
         }
+        hotkey::MSG_CAPTURED => {
+            if let Some(state) = app_of(hwnd) {
+                state.take_capture();
+            }
+            0
+        }
         WM_DESTROY => {
             remove_tray(hwnd);
             hotkey::uninstall();

@@ -232,6 +232,13 @@ static WIN_REPLAYED: AtomicBool = AtomicBool::new(false);
 static WIN_FIRED: AtomicBool = AtomicBool::new(false);
 static WIN_USED: AtomicBool = AtomicBool::new(false);
 static WIN_CAPTURED: AtomicBool = AtomicBool::new(false);
+static CAP_VK: AtomicU32 = AtomicU32::new(0);
+static CAP_MODS: AtomicU32 = AtomicU32::new(0);
+pub const MSG_CAPTURED: u32 = WM_APP + 11;
+
+pub fn captured() -> (u32, u32) {
+    (CAP_VK.load(Ordering::Relaxed), CAP_MODS.load(Ordering::Relaxed))
+}
 
 unsafe fn send_key(vk: u32, down: bool) {
     let flags = if down { 0 } else { KEYEVENTF_KEYUP };
@@ -285,6 +292,13 @@ unsafe extern "system" fn hook_proc(code: i32, wp: WPARAM, lp: LPARAM) -> LRESUL
         } else {
             PRESSED.fetch_and(!bit, Ordering::Relaxed);
         }
+    }
+    if down && bit == 0 && CAPTURING.load(Ordering::Relaxed) {
+        let recorded = if vk == VK_ESCAPE { 0 } else { vk };
+        CAP_VK.store(recorded, Ordering::Relaxed);
+        CAP_MODS.store(tracked_mods(), Ordering::Relaxed);
+        PostMessageW(TARGET, MSG_CAPTURED, 0, 0);
+        return 1;
     }
     if down && bit == 0 && WIN_LOCAL.load(Ordering::Relaxed) {
         WIN_USED.store(true, Ordering::Relaxed);

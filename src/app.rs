@@ -544,7 +544,7 @@ impl App {
         if !down {
             return false;
         }
-        if let Some(index) = self.capture {
+        if self.capture.is_some() {
             if key == VK_ESCAPE {
                 self.capture = None;
                 hotkey::set_capturing(false);
@@ -554,12 +554,11 @@ impl App {
             if hotkey::is_modifier(key) {
                 return true;
             }
-            let mods = hotkey::current_mods();
-            self.set_shortcut(index, key, mods);
-            self.capture = None;
-            hotkey::set_capturing(false);
-            self.settings.save();
-            hotkey::update(self.settings);
+            if key == VK_ESCAPE {
+                self.capture = None;
+                hotkey::set_capturing(false);
+                self.invalidate();
+            }
             return true;
         }
         if self.about_mode && hotkey::current_mods() & MOD_CONTROL != 0 {
@@ -949,6 +948,22 @@ impl App {
             hotkey::update(self.settings);
             self.invalidate();
         }
+    }
+
+    pub unsafe fn take_capture(&mut self) {
+        let index = match self.capture {
+            Some(value) => value,
+            None => return,
+        };
+        let (vk, mods) = hotkey::captured();
+        self.capture = None;
+        hotkey::set_capturing(false);
+        if vk != 0 {
+            self.set_shortcut(index, vk, mods);
+            self.settings.save();
+            hotkey::update(self.settings);
+        }
+        self.invalidate();
     }
 
     fn dismiss_capture(&mut self) {
