@@ -85,6 +85,9 @@ pub struct App {
     dropdown_anim: Anim,
     lang_scroll: Anim,
     lang_scroll_target: f32,
+    lang_drag: bool,
+    lang_grab: f32,
+    lang_hover_bar: bool,
     dropdown_open: bool,
     lang_focus: bool,
     about_mode: bool,
@@ -134,6 +137,9 @@ impl App {
             dropdown_anim: Anim::fast(0.0, 46.0),
             lang_scroll: Anim::fast(0.0, 26.0),
             lang_scroll_target: 0.0,
+            lang_drag: false,
+            lang_grab: 0.0,
+            lang_hover_bar: false,
             dropdown_open: false,
             lang_focus: false,
             about_mode: false,
@@ -402,6 +408,21 @@ impl App {
             self.invalidate();
             return;
         }
+        if self.lang_drag {
+            let s = self.scale();
+            let l = self.layout();
+            self.scroll_drag_to(&l, y / s, self.lang_grab);
+            return;
+        }
+        if self.dropdown_open {
+            let s = self.scale();
+            let l = self.layout();
+            let hb = self.scroll_bar_hit(&l, x / s, y / s);
+            if hb != self.lang_hover_bar {
+                self.lang_hover_bar = hb;
+                self.invalidate();
+            }
+        }
         let id = self.hit(x, y);
         if id != self.hover {
             self.hover = id;
@@ -411,6 +432,10 @@ impl App {
     }
 
     pub unsafe fn on_leave(&mut self) {
+        if self.lang_hover_bar {
+            self.lang_hover_bar = false;
+            self.invalidate();
+        }
         if self.hover != 0 {
             self.hover = 0;
             self.animate_hover(0);
@@ -430,6 +455,20 @@ impl App {
     }
 
     pub unsafe fn on_down(&mut self, x: f32, y: f32) {
+        if self.dropdown_open {
+            let s = self.scale();
+            let px = x / s;
+            let py = y / s;
+            let l = self.layout();
+            if self.scroll_bar_hit(&l, px, py) {
+                if let Some((thumb_y, thumb_h, _)) = self.scroll_geom(&l) {
+                    self.lang_grab = if py >= thumb_y && py <= thumb_y + thumb_h { py - thumb_y } else { thumb_h * 0.5 };
+                    self.lang_drag = true;
+                    self.scroll_drag_to(&l, py, self.lang_grab);
+                    return;
+                }
+            }
+        }
         if self.dropdown_open {
             let s = self.scale();
             let px = x / s;
@@ -482,6 +521,11 @@ impl App {
     }
 
     pub unsafe fn on_up(&mut self, x: f32, y: f32) {
+        if self.lang_drag {
+            self.lang_drag = false;
+            self.invalidate();
+            return;
+        }
         if self.selecting {
             self.selecting = false;
             self.invalidate();
@@ -832,6 +876,36 @@ impl App {
         if (target - self.lang_scroll_target).abs() > 0.5 {
             self.lang_scroll_target = target;
             self.lang_scroll.to(target);
+        }
+    }
+
+    fn scroll_geom(&self, l: &Layout) -> Option<(f32, f32, f32)> {
+        if l.list_max_scroll <= 0.0 {
+            return None;
+        }
+        let track_h = l.list.h - 16.0;
+        let thumb_h = (track_h * (l.list.h / (l.list.h + l.list_max_scroll))).max(28.0);
+        let span = track_h - thumb_h;
+        let pos = (self.lang_scroll.value / l.list_max_scroll).clamp(0.0, 1.0);
+        Some((l.list.y + 8.0 + span * pos, thumb_h, span))
+    }
+
+    fn scroll_bar_hit(&self, l: &Layout, px: f32, py: f32) -> bool {
+        if self.scroll_geom(l).is_none() {
+            return false;
+        }
+        px >= l.list.x + l.list.w - 16.0 && px <= l.list.x + l.list.w && py >= l.list.y + 4.0 && py <= l.list.y + l.list.h - 4.0
+    }
+
+    fn scroll_drag_to(&mut self, l: &Layout, py: f32, grab: f32) {
+        if let Some((_, _, span)) = self.scroll_geom(l) {
+            if span > 0.0 {
+                let pos = ((py - l.list.y - 8.0 - grab) / span).clamp(0.0, 1.0);
+                let target = pos * l.list_max_scroll;
+                self.lang_scroll_target = target;
+                self.lang_scroll.snap(target);
+                self.invalidate();
+            }
         }
     }
 
@@ -1404,12 +1478,10 @@ impl App {
             g.text(i18n::NAMES[i], x + 14.0, iy, wd - 28.0, 40.0, size, selected, ink, Align::Near);
         }
         g.unclip();
-        if l.list_max_scroll > 0.0 {
-            let track_h = hgt - 16.0;
-            let thumb_h = (track_h * (hgt / (hgt + l.list_max_scroll))).max(28.0);
-            let pos = if l.list_max_scroll > 0.0 { off / l.list_max_scroll } else { 0.0 };
-            let thumb_y = y + 8.0 + (track_h - thumb_h) * pos;
-            g.round(x + wd - 8.0, thumb_y, 3.0, thumb_h, 1.5, with_alpha(theme.dim, 0.45));
+        if let Some((thumb_y, thumb_h, _)) = self.scroll_geom(&l) {
+            let alpha = if self.lang_drag { 0.85 } else if self.lang_hover_bar { 0.62 } else { 0.42 };
+            let tw = if self.lang_drag || self.lang_hover_bar { 4.0 } else { 3.0 };
+            g.round(x + wd - 5.0 - tw, thumb_y, tw, thumb_h, tw * 0.5, with_alpha(theme.dim, alpha * a));
         }
     }
 }
