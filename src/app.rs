@@ -93,6 +93,18 @@ pub struct App {
     max_scroll: f32,
     capture: Option<usize>,
     capture_anim: Anim,
+    sel_anchor: Option<(usize, usize)>,
+    sel_caret: Option<(usize, usize)>,
+    selecting: bool,
+    sel_rows: Vec<String>,
+    sel_x: Vec<Vec<f32>>,
+    sel_metrics: (f32, usize),
+    sel_word: bool,
+    sel_word_start: (usize, usize),
+    sel_word_end: (usize, usize),
+    last_click: f64,
+    last_x: f32,
+    last_y: f32,
 }
 
 impl App {
@@ -130,6 +142,18 @@ impl App {
             max_scroll: 0.0,
             capture: None,
             capture_anim: Anim::new(0.0),
+            sel_anchor: None,
+            sel_caret: None,
+            selecting: false,
+            sel_rows: Vec::new(),
+            sel_x: Vec::new(),
+            sel_metrics: (-1.0, usize::MAX),
+            sel_word: false,
+            sel_word_start: (0, 0),
+            sel_word_end: (0, 0),
+            last_click: -10.0,
+            last_x: 0.0,
+            last_y: 0.0,
         };
         app.dpi = GetDpiForWindow(hwnd);
         if app.dpi == 0 {
@@ -356,6 +380,28 @@ impl App {
     }
 
     pub unsafe fn on_mouse_move(&mut self, x: f32, y: f32) {
+        if self.selecting {
+            let s = self.scale();
+            if self.sel_word {
+                if let Some((r, i)) = self.about_point(x / s, y / s) {
+                    if let Some((ws, we)) = self.word_at(r, i) {
+                        if (r, ws) < self.sel_word_start {
+                            self.sel_anchor = Some((r, ws));
+                            self.sel_caret = Some(self.sel_word_end);
+                        } else {
+                            self.sel_anchor = Some(self.sel_word_start);
+                            self.sel_caret = Some((r, we));
+                        }
+                    }
+                }
+            } else if let Some(p) = self.about_point(x / s, y / s) {
+                if self.sel_caret != Some(p) {
+                    self.sel_caret = Some(p);
+                }
+            }
+            self.invalidate();
+            return;
+        }
         let id = self.hit(x, y);
         if id != self.hover {
             self.hover = id;
@@ -396,6 +442,33 @@ impl App {
                 self.invalidate();
             }
         }
+        if self.about_mode {
+            let s = self.scale();
+            let px = x / s;
+            let py = y / s;
+            let now = clock();
+            let dbl = now - self.last_click < 0.55 && (px - self.last_x).abs() < 6.0 && (py - self.last_y).abs() < 6.0;
+            self.last_click = now;
+            self.last_x = px;
+            self.last_y = py;
+            if let Some(p) = self.about_point(px, py) {
+                if dbl && self.select_word(p) {
+                    return;
+                }
+                self.sel_word = false;
+                self.sel_anchor = Some(p);
+                self.sel_caret = Some(p);
+                self.selecting = true;
+                self.invalidate();
+                return;
+            }
+            if self.sel_anchor.is_some() {
+                self.sel_anchor = None;
+                self.sel_caret = None;
+                self.sel_word = false;
+                self.invalidate();
+            }
+        }
         let id = self.hit(x, y);
         if id != 0 && id != ID_LANG {
             self.lang_focus = false;
@@ -409,6 +482,12 @@ impl App {
     }
 
     pub unsafe fn on_up(&mut self, x: f32, y: f32) {
+        if self.selecting {
+            self.selecting = false;
+            self.invalidate();
+            return;
+        }
+        self.sel_word = false;
         let id = self.hit(x, y);
         let pressed = self.press;
         self.press = 0;
@@ -483,6 +562,17 @@ impl App {
             hotkey::update(self.settings);
             return true;
         }
+        if self.about_mode && hotkey::current_mods() & MOD_CONTROL != 0 {
+            if key == 0x43 {
+                if self.copy_selection() {
+                    return true;
+                }
+            }
+            if key == 0x41 {
+                self.select_all_about();
+                return true;
+            }
+        }
         if self.lang_focus {
             if key == VK_UP {
                 self.step_language(-1);
@@ -509,6 +599,188 @@ impl App {
             }
         }
         false
+    }
+
+    fn about_text_rect(&self) -> RectF {
+        let r = self.layout().card_about;
+        RectF { x: r.x + 28.0, y: r.y + 24.0, w: r.w - 56.0, h: r.h - 48.0 }
+    }
+
+    pub fn about_ibeam(&self, x: f32, y: f32) -> bool {
+        let s = self.scale();
+        self.about_mode && self.about_point(x / s, y / s).is_some()
+    }
+
+    fn about_point(&self, x: f32, y: f32) -> Option<(usize, usize)> {
+        if self.sel_rows.is_empty() {
+            return None;
+        }
+        let r = self.about_text_rect();
+        if x < r.x - 8.0 || x > r.x + r.w + 8.0 || y < r.y - 6.0 || y > r.y + r.h {
+            return None;
+        }
+        let line_h = 24.0f32;
+        let row = ((y - r.y + self.scroll) / line_h).floor();
+        let row = row.clamp(0.0, self.sel_rows.len() as f32 - 1.0) as usize;
+        let xs = &self.sel_x[row];
+        let rel = (x - r.x).max(0.0);
+        let mut idx = 0usize;
+        for (i, wx) in xs.iter().enumerate() {
+            if *wx <= rel {
+                idx = i;
+            } else {
+                break;
+            }
+        }
+        if idx + 1 < xs.len() && rel - xs[idx] > xs[idx + 1] - rel {
+            idx += 1;
+        }
+        Some((row, idx))
+    }
+
+    fn word_at(&self, row: usize, idx: usize) -> Option<(usize, usize)> {
+        let line = self.sel_rows.get(row)?;
+        let chars: Vec<char> = line.chars().collect();
+        let len = chars.len();
+        if len == 0 {
+            return None;
+        }
+        let mut i = idx.min(len - 1);
+        let cls = word_class(chars[i]);
+        if cls == 0 || cls == 3 {
+            return None;
+        }
+        if cls == 2 {
+            let mut start = i;
+            while start > 0 && word_class(chars[start - 1]) == 2 {
+                start -= 1;
+            }
+            let mut end = i;
+            while end + 1 < len && word_class(chars[end + 1]) == 2 {
+                end += 1;
+            }
+            let mut pos = start;
+            while pos <= end {
+                let maxlen = (end - pos + 1).min(4);
+                let mut take = 1;
+                let mut l = maxlen;
+                while l >= 2 {
+                    if has_word(&chars[pos..pos + l]) {
+                        take = l;
+                        break;
+                    }
+                    l -= 1;
+                }
+                if pos + take > i {
+                    return Some((pos, pos + take));
+                }
+                pos += take;
+            }
+            return Some((i, i + 1));
+        }
+        while i > 0 && word_class(chars[i - 1]) == cls {
+            i -= 1;
+        }
+        let start = i;
+        let mut end = i;
+        while end + 1 < len && word_class(chars[end + 1]) == cls {
+            end += 1;
+        }
+        Some((start, end + 1))
+    }
+
+    unsafe fn select_word(&mut self, p: (usize, usize)) -> bool {
+        let Some((ws, we)) = self.word_at(p.0, p.1) else {
+            return false;
+        };
+        self.sel_word = true;
+        self.sel_word_start = (p.0, ws);
+        self.sel_word_end = (p.0, we);
+        self.sel_anchor = Some((p.0, ws));
+        self.sel_caret = Some((p.0, we));
+        self.selecting = true;
+        self.invalidate();
+        true
+    }
+
+    pub unsafe fn on_dblclick(&mut self, x: f32, y: f32) {
+        if self.about_mode {
+            let s = self.scale();
+            if let Some(p) = self.about_point(x / s, y / s) {
+                if self.select_word(p) {
+                    return;
+                }
+            }
+        }
+        self.on_down(x, y);
+    }
+
+    fn sel_norm(&self) -> Option<((usize, usize), (usize, usize))> {
+        let a = self.sel_anchor?;
+        let c = self.sel_caret?;
+        if a == c {
+            return None;
+        }
+        Some(if a <= c { (a, c) } else { (c, a) })
+    }
+
+    fn select_all_about(&mut self) {
+        if self.sel_rows.is_empty() {
+            return;
+        }
+        let last = self.sel_rows.len() - 1;
+        let len = self.sel_rows[last].chars().count();
+        self.sel_anchor = Some((0, 0));
+        self.sel_caret = Some((last, len));
+        self.invalidate();
+    }
+
+    fn copy_selection(&mut self) -> bool {
+        let Some(((r1, c1), (r2, c2))) = self.sel_norm() else {
+            return false;
+        };
+        let mut out = String::new();
+        for row in r1..=r2 {
+            let Some(line) = self.sel_rows.get(row) else {
+                continue;
+            };
+            let chars: Vec<char> = line.chars().collect();
+            let start = if row == r1 { c1 } else { 0 }.min(chars.len());
+            let end = if row == r2 { c2 } else { chars.len() }.min(chars.len());
+            if start < end {
+                out.extend(&chars[start..end]);
+            }
+            if row != r2 {
+                out.push('\r');
+                out.push('\n');
+            }
+        }
+        if out.is_empty() {
+            return false;
+        }
+        unsafe { set_clipboard(&out) }
+    }
+
+    unsafe fn sync_sel_layout(&mut self, g: &mut Gfx, lines: &[String], inner_w: f32) {
+        let key = (inner_w.round(), self.lang);
+        if self.sel_metrics == key && self.sel_rows.len() == lines.len() {
+            return;
+        }
+        self.sel_metrics = key;
+        self.sel_rows = lines.to_vec();
+        self.sel_x.clear();
+        for line in lines {
+            let mut widths: Vec<f32> = Vec::with_capacity(line.chars().count() + 1);
+            let mut acc = 0.0f32;
+            widths.push(0.0);
+            for ch in line.chars() {
+                let mut buf = [0u8; 4];
+                let s: &str = ch.encode_utf8(&mut buf);
+                acc += g.text_width(s, 14, false);
+                widths.push(acc);
+            }
+            self.sel_x.push(widths);
+        }
     }
 
     pub unsafe fn set_language(&mut self, index: usize) {
@@ -607,6 +879,10 @@ impl App {
         }
         if id == ID_ABOUT {
             self.about_mode = !self.about_mode;
+            self.sel_anchor = None;
+            self.sel_caret = None;
+            self.selecting = false;
+            self.sel_word = false;
             self.scroll = 0.0;
             self.scroll_target = 0.0;
             self.request_anim();
@@ -999,6 +1275,7 @@ impl App {
         let bottom = r.y + r.h - 24.0;
         let line_h = 24.0f32;
         let lines = wrap(g, t.about_text, inner_w, 14);
+        self.sync_sel_layout(g, &lines, inner_w);
         let total = lines.len() as f32 * line_h;
         self.max_scroll = (total - (bottom - top)).max(0.0);
         if self.scroll > self.max_scroll {
@@ -1007,6 +1284,21 @@ impl App {
         }
         g.clip(inner_x - 4.0, top - 4.0, inner_w + 8.0, bottom - top + 8.0);
         let offset = top - self.scroll;
+        if let Some(((r1, c1), (r2, c2))) = self.sel_norm() {
+            for row in r1..=r2 {
+                let Some(xs) = self.sel_x.get(row) else {
+                    continue;
+                };
+                let chars = self.sel_rows[row].chars().count();
+                let start = if row == r1 { c1 } else { 0 }.min(chars);
+                let end = if row == r2 { c2 } else { chars }.min(chars);
+                if end <= start {
+                    continue;
+                }
+                let y = offset + row as f32 * line_h;
+                g.rect(inner_x + xs[start], y + 3.0, xs[end] - xs[start], line_h - 6.0, with_alpha(theme.accent, 0.32));
+            }
+        }
         for (i, line) in lines.iter().enumerate() {
             let y = offset + i as f32 * line_h;
             if y > bottom || y + line_h < top {
@@ -1073,6 +1365,83 @@ impl App {
             g.round(x + wd - 8.0, thumb_y, 3.0, thumb_h, 1.5, with_alpha(theme.dim, 0.45));
         }
     }
+}
+
+static WORDS: &[&str] = &[
+    "一个", "可以", "快捷", "快捷键", "快速", "创建", "新建", "文本", "文本文档", "文档",
+    "自制", "小工具", "工具", "记事本", "打开", "设置", "软件", "自定义", "版本", "版权",
+    "开源", "协议", "项目", "链接", "重置", "清除", "保存", "自动", "浅色", "深色",
+    "主题", "语言", "简体", "繁体", "中文", "英文", "功能", "开关", "启动", "开机",
+    "自启动", "鼠标", "键盘", "系统", "文件", "文件夹", "资源", "管理器", "路径", "桌面",
+    "当前", "目录", "位置", "窗口", "界面", "按钮", "选项", "菜单", "托盘", "图标",
+    "任务", "进程", "详细", "信息", "内存", "占用", "性能", "渲染", "架构", "实现",
+    "国际", "国际化", "默认", "列表", "滚动", "输入", "输出", "复制", "粘贴", "选择",
+    "选中", "取消", "确定", "关闭", "最小化", "最大化", "退出", "返回", "关于", "帮助",
+    "提示", "错误", "失败", "成功", "用户", "权限", "管理员", "运行", "加载", "停止",
+    "状态", "完成", "等待", "正在", "已经", "没有", "什么", "怎么", "为什么", "这些",
+    "那些", "我们", "你们", "他们", "自己", "现在", "之前", "之后", "以后", "以前",
+    "时候", "时间", "日期", "今天", "明天", "昨天", "小时", "分钟", "数量", "字数",
+    "行数", "字体", "大小", "颜色", "背景", "边框", "圆角", "阴影", "透明", "渐变",
+    "动画", "过渡", "交互", "反馈", "体验", "设计", "风格", "现代", "简洁", "清晰",
+    "流畅", "稳定", "可靠", "安全", "更新", "升级", "下载", "安装", "卸载", "配置",
+    "参数", "属性", "方法", "函数", "变量", "类型", "对象", "数据", "程序", "代码",
+    "编译", "构建", "依赖", "体积", "单文件", "单进程", "进程名", "显示", "隐藏", "左边",
+    "右边", "上面", "下面", "中间", "水平", "垂直", "方向", "点击", "双击", "右键",
+    "左键", "滚轮", "拖拽", "拖放", "焦点", "聚焦", "输入框", "下拉", "展开", "收起",
+    "折叠", "保存", "另存", "恢复", "应用", "确认", "处理", "支持", "需要", "使用",
+    "进行", "提供", "包括", "通过", "根据", "以及", "或者", "而且", "但是", "因为",
+    "所以", "如果", "虽然", "然后", "同时", "非常", "比较", "更加", "最好", "尽量",
+    "注意", "记得", "可以", "不能", "不要", "不会", "已经", "一直", "随时", "立即",
+    "马上", "经常", "偶尔",
+];
+
+fn has_word(chars: &[char]) -> bool {
+    WORDS.iter().any(|w| w.chars().eq(chars.iter().copied()))
+}
+
+fn is_cjk(c: char) -> bool {
+    let u = c as u32;
+    (0x2E80..=0x9FFF).contains(&u)
+        || (0x3040..=0x30FF).contains(&u)
+        || (0xAC00..=0xD7AF).contains(&u)
+        || (0xF900..=0xFAFF).contains(&u)
+}
+
+fn word_class(c: char) -> u8 {
+    if c.is_whitespace() {
+        return 0;
+    }
+    if is_cjk(c) {
+        return 2;
+    }
+    if c.is_alphanumeric() || "_-.:/?=&%#@+~'\\".contains(c) {
+        return 1;
+    }
+    3
+}
+
+unsafe fn set_clipboard(text: &str) -> bool {
+    if OpenClipboard(0) == 0 {
+        return false;
+    }
+    let _ = EmptyClipboard();
+    let wide: Vec<u16> = text.encode_utf16().chain(core::iter::once(0)).collect();
+    let mem = GlobalAlloc(0x0002, wide.len() * 2);
+    let mut ok = mem != 0;
+    if ok {
+        let dst = GlobalLock(mem) as *mut u16;
+        if dst.is_null() {
+            ok = false;
+        } else {
+            core::ptr::copy_nonoverlapping(wide.as_ptr(), dst, wide.len());
+            let _ = GlobalUnlock(mem);
+            if SetClipboardData(13, mem) == 0 {
+                ok = false;
+            }
+        }
+    }
+    let _ = CloseClipboard();
+    ok
 }
 
 fn wrap(g: &mut Gfx, text: &str, width: f32, size: u8) -> Vec<String> {

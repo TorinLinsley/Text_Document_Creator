@@ -342,6 +342,20 @@ unsafe extern "system" fn wnd_proc(hwnd: HWND, msg: u32, wp: WPARAM, lp: LPARAM)
             }
             1
         }
+        WM_SETCURSOR => {
+            if lp as u32 & 0xFFFF == HTCLIENT as u32 {
+                let mut pt = POINT { x: 0, y: 0 };
+                GetCursorPos(&mut pt);
+                ScreenToClient(hwnd, &mut pt);
+                if let Some(state) = app_of(hwnd) {
+                    if state.about_ibeam(pt.x as f32, pt.y as f32) {
+                        SetCursor(LoadCursorW(0, IDC_IBEAM));
+                        return 1;
+                    }
+                }
+            }
+            DefWindowProcW(hwnd, msg, wp, lp)
+        }
         WM_NCHITTEST => region_test(hwnd, lp),
         WM_GETMINMAXINFO => {
             let s = scale_of(hwnd);
@@ -420,6 +434,15 @@ unsafe extern "system" fn wnd_proc(hwnd: HWND, msg: u32, wp: WPARAM, lp: LPARAM)
                 let y = ((lp >> 16) & 0xFFFF) as i16 as f32;
                 SetFocus(hwnd);
                 state.on_down(x, y);
+            }
+            0
+        }
+        WM_LBUTTONDBLCLK => {
+            if let Some(state) = app_of(hwnd) {
+                let x = (lp & 0xFFFF) as i16 as f32;
+                let y = ((lp >> 16) & 0xFFFF) as i16 as f32;
+                SetFocus(hwnd);
+                state.on_dblclick(x, y);
             }
             0
         }
