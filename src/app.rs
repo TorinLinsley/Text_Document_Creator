@@ -442,7 +442,7 @@ impl App {
                 self.invalidate();
             }
         }
-        if self.about_mode {
+        if self.about_mode && !self.dropdown_open {
             let s = self.scale();
             let px = x / s;
             let py = y / s;
@@ -608,7 +608,12 @@ impl App {
 
     pub fn about_ibeam(&self, x: f32, y: f32) -> bool {
         let s = self.scale();
-        self.about_mode && self.about_point(x / s, y / s).is_some()
+        let px = x / s;
+        let py = y / s;
+        if self.dropdown_open && self.layout().list.has(px, py) {
+            return false;
+        }
+        self.about_mode && self.about_point(px, py).is_some()
     }
 
     fn about_point(&self, x: f32, y: f32) -> Option<(usize, usize)> {
