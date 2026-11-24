@@ -446,6 +446,12 @@ unsafe extern "system" fn wnd_proc(hwnd: HWND, msg: u32, wp: WPARAM, lp: LPARAM)
             }
             0
         }
+        WM_CAPTURECHANGED => {
+            if let Some(state) = app_of(hwnd) {
+                state.cancel_drag();
+            }
+            0
+        }
         WM_LBUTTONUP => {
             if let Some(state) = app_of(hwnd) {
                 let x = (lp & 0xFFFF) as i16 as f32;

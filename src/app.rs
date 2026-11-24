@@ -431,6 +431,16 @@ impl App {
         }
     }
 
+    pub unsafe fn cancel_drag(&mut self) {
+        if self.selecting || self.lang_drag {
+            self.selecting = false;
+            self.sel_word = false;
+            self.lang_drag = false;
+            self.press = 0;
+            self.invalidate();
+        }
+    }
+
     pub unsafe fn on_leave(&mut self) {
         if self.lang_hover_bar {
             self.lang_hover_bar = false;
@@ -455,6 +465,7 @@ impl App {
     }
 
     pub unsafe fn on_down(&mut self, x: f32, y: f32) {
+        SetCapture(self.hwnd);
         if self.dropdown_open {
             let s = self.scale();
             let px = x / s;
@@ -521,19 +532,21 @@ impl App {
     }
 
     pub unsafe fn on_up(&mut self, x: f32, y: f32) {
-        if self.lang_drag {
-            self.lang_drag = false;
-            self.invalidate();
-            return;
-        }
-        if self.selecting {
-            self.selecting = false;
+        let pressed = self.press;
+        let dragging = self.lang_drag;
+        let selecting = self.selecting;
+        self.lang_drag = false;
+        self.selecting = false;
+        ReleaseCapture();
+        if dragging || selecting {
+            if selecting {
+                self.sel_word = false;
+            }
             self.invalidate();
             return;
         }
         self.sel_word = false;
         let id = self.hit(x, y);
-        let pressed = self.press;
         self.press = 0;
         if id != 0 && id == pressed {
             self.action(id);
