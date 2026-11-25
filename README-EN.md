@@ -72,6 +72,8 @@ This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `
 - **Language**: 20 languages in the dropdown, scrollable and switchable with the arrow keys while focused
 - **Theme**: Auto / Light / Dark, with Auto following the system theme live
 
+The core feature is creating a new text document; opening Notepad is optional and disabled by default, so enable it in the settings when needed.
+
 ## Notes
 
 - Holding a shortcut keeps triggering it with a 120 ms throttle, creating several files or opening several Notepad windows
