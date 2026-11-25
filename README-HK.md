@@ -206,7 +206,11 @@ cargo build --release
   4. 完成，登錄檔與系統中不會留下任何設定殘留
 - **2.0.0 及更早**
   1. 從匣盤選單選「結束」
-  2. 執行 `schtasks /Delete /TN TextDocumentCreator /F` 刪除排程工作
+  2. 刪除排程工作：以**管理員身分**開啟「命令提示字元」或「PowerShell」（開始功能表搜尋後按右鍵「以管理員身分執行」），執行下面的指令；需要管理員權限，否則會出現「拒絕存取」
+     ```bat
+     schtasks /Delete /TN TextDocumentCreator /F
+     ```
+     顯示「成功: 已成功刪除排程工作 "TextDocumentCreator"」即表示刪除完成；若顯示「系統找不到指定的檔案」，表示該工作本來就不存在，直接進行下一步
   3. 開啟登錄編輯器，刪除 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
   4. 若存在，刪除 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator` 值（最早兩版才有）
   5. 刪除 exe

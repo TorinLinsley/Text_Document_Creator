@@ -206,7 +206,11 @@ Available `language` codes:
   4. Done, nothing is left in the registry or anywhere else
 - **2.0.0 and earlier**
   1. Choose Exit in the tray menu
-  2. Run `schtasks /Delete /TN TextDocumentCreator /F` to delete the scheduled task
+  2. Delete the scheduled task: open Command Prompt or PowerShell **as administrator** (search it in the Start menu, then choose Run as administrator) and run the command below; administrator rights are required, otherwise it fails with "Access is denied"
+     ```bat
+     schtasks /Delete /TN TextDocumentCreator /F
+     ```
+     "SUCCESS: The scheduled task \"TextDocumentCreator\" was successfully deleted." means it is gone; "ERROR: The system cannot find the file specified." means the task never existed, so continue with the next step
   3. Open Registry Editor and delete `HKEY_CURRENT_USER\Software\TextDocumentCreator`
   4. If it exists, delete the `Text_Document_Creator` value under `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` (only the two earliest releases)
   5. Delete the exe
