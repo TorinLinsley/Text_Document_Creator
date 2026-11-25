@@ -10,7 +10,7 @@ The settings window is not assembled from stock controls but drawn from scratch:
 
 - **Single exe**: statically linked CRT, only depends on `user32` / `gdi32` / `dwmapi` / `shell32` / `advapi32` / `uxtheme` / `ole32`, so it runs from any Windows 10/11 machine as-is
 - **Single process**: no child processes and no host process; one entry in both the Processes and Details tabs of Task Manager, with a display name that follows the system language
-- **Settings are just a file**: everything lives in `tdc_config.json` next to the exe, written on first run and updated on every change, so deleting that one file restores the factory state
+- **Settings are just a file**: from 2.1.0 on everything lives in `tdc_config.json` next to the exe, written on first run and updated on every change, so deleting that one file restores the factory state; 2.0.0 and earlier kept the same settings in the registry under `HKEY_CURRENT_USER\Software\TextDocumentCreator`
 - **Global hotkeys**: `Win+F` creates a text document and `Win+J` opens Notepad by default; combinations that include `Win` are overridden as well
 - **Tray resident**: starts silently in the tray without showing a window; left click opens the settings, right click shows Settings / Run at startup / Exit
 - **Modern UI**: hover, press, dropdown, toggle and theme transitions are all animated and interruptible
