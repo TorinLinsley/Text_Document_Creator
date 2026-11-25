@@ -171,7 +171,7 @@ cargo build --release
 | `src/theme.rs` | 深浅色调色板、颜色混合、系统主题判定与主题过渡插值 |
 | `src/anim.rs` | 指数逼近动画与速度控制 |
 | `src/i18n.rs` | 20 种语言文案、语言代码表与系统语言检测 |
-| `src/config.rs` | `tdc_config.json` 读写、默认状态、开机自启动计划任务登记 |
+| `src/config.rs` | `tdc_config.json` 读写、默认值、开机自启动计划任务登记 |
 | `src/hotkey.rs` | 全局键盘钩子线程、按键捕获与绑定、创建文本文档、启动记事本 |
 | `src/ffi.rs` | Win32 常量与 user32 / kernel32 / shell32 等 API 声明 |
 | `src/sys.rs` | 结构体定义与其余 API 声明（注册表、计划任务、COM、托盘、进程） |

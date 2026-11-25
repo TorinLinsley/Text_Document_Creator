@@ -171,7 +171,7 @@ Output: `target\release\text_document_creator.exe`
 | `src/theme.rs` | Light and dark palettes, colour mixing, system theme detection and transition interpolation |
 | `src/anim.rs` | Exponential approach animation and speed control |
 | `src/i18n.rs` | Strings for 20 languages, locale codes and system language detection |
-| `src/config.rs` | Reads and writes `tdc_config.json`, the default state, autostart scheduled task |
+| `src/config.rs` | Reads and writes `tdc_config.json`, default values, autostart scheduled task |
 | `src/hotkey.rs` | Global keyboard hook thread, key capture and binding, text file creation, Notepad launch |
 | `src/ffi.rs` | Win32 constants and user32 / kernel32 / shell32 declarations |
 | `src/sys.rs` | Structures and the remaining declarations (registry, scheduled task, COM, tray, processes) |
