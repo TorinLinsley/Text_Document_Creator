@@ -23,7 +23,7 @@
 
 1. 打开 [Releases](https://github.com/TorinLinsley/Text_Document_Creator/releases) 下载最新的 `text_document_creator_版本号.exe`
 2. 放到任意目录（例如 `D:\Tools\TextDocumentCreator`），双击即可运行
-3. 无需安装，也不需要 .NET 或 VC++ 运行库；删除 exe 即不再运行（设置与开机自启动登记仍在，需要一并清掉见下文「彻底卸载」）
+3. 无需安装，也不需要 .NET 或 VC++ 运行库
 
 ### 自行编译
 
