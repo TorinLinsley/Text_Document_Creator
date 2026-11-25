@@ -46,10 +46,10 @@ This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `
 
 ### Usage
 
-1. Double click to run; the app stays in the tray and shows no window on startup
-2. Press `Win+F`: creates `新建文本文档.txt` in the **currently focused Explorer folder**, or `新建文本文档_1.txt`, `_2`... when it already exists; when the desktop is focused the file is created there
-3. Press `Win+J`: opens Notepad in a new window every time, so several can be opened at once; about 0.15 s from key press to window
-4. Left click the tray icon to open the settings: toggle features, bind shortcuts, switch language and theme, or read About
+- Double click to run; the app stays in the tray and shows no window on startup
+- Press `Win+F`: creates `新建文本文档.txt` in the **currently focused Explorer folder**, or `新建文本文档_1.txt`, `_2`... when it already exists; when the desktop is focused the file is created there
+- Press `Win+J`: opens Notepad in a new window every time, so several can be opened at once; about 0.15 s from key press to window
+- Left click the tray icon to open the settings: toggle features, bind shortcuts, switch language and theme, or read About
 
 ### Uninstall
 
