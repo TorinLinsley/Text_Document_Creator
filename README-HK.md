@@ -18,15 +18,22 @@
 - **高 DPI 自適應**：Per-Monitor V2，125% / 150% 下文字清晰；執行中變更縮放或解析度會即時重排
 - **輕量**：exe 約 508 KB；只常駐匣盤、未開啟設定介面且靜止時，專用工作集僅約 **280 KB**，開啟設定介面後私有記憶體約 1.5 MB
 
-## 下載與安裝
+## 使用
 
-### 直接下載
+1. 雙擊執行，程式常駐匣盤（啟動時不顯示視窗）
+2. 按 `Win+F`：在**目前聚焦的檔案總管目錄**中建立 `新建文本文檔.txt`，已存在則依序為 `新建文本文檔_1.txt`、`_2`…；焦點在桌面時建立到桌面
+3. 按 `Win+J`：每次都在新視窗開啟記事本，連續按下可同時開啟多個，從按下到視窗出現約 0.15 秒
+4. 左鍵單擊匣盤圖示開啟設定：開關功能、綁定快速鍵、切換語言與主題、檢視關於
+
+### 下載與安裝
+
+#### 直接下載
 
 1. 開啟 [Releases](https://github.com/TorinLinsley/Text_Document_Creator/releases) 下載最新的 `text_document_creator_版本号.exe`
 2. 放到任意目錄（例如 `D:\Tools\TextDocumentCreator`），雙擊即可執行
 3. 無需安裝，也不需要 .NET 或 VC++ 執行階段
 
-### 自行編譯
+#### 自行編譯
 
 ```bash
 git clone https://github.com/TorinLinsley/Text_Document_Creator.git
@@ -36,18 +43,29 @@ cargo build --release
 
 需要 Rust 工具鏈（MSVC 目標）與 Windows SDK，產物為 `target\release\text_document_creator.exe`。
 
-### 首次執行
+#### 首次執行
 
 - 啟動後不會彈窗，圖示直接出現在匣盤，左鍵單擊開啟設定介面
 - 需要開機自動啟動時，在設定介面或匣盤選單中開啟「開機自動啟動」
 - 解除安裝：見下方「[解除安裝](#解除安裝)」
 
-## 使用
+### 解除安裝
 
-1. 雙擊執行，程式常駐匣盤（啟動時不顯示視窗）
-2. 按 `Win+F`：在**目前聚焦的檔案總管目錄**中建立 `新建文本文檔.txt`，已存在則依序為 `新建文本文檔_1.txt`、`_2`…；焦點在桌面時建立到桌面
-3. 按 `Win+J`：每次都在新視窗開啟記事本，連續按下可同時開啟多個，從按下到視窗出現約 0.15 秒
-4. 左鍵單擊匣盤圖示開啟設定：開關功能、綁定快速鍵、切換語言與主題、檢視關於
+- **2.1.0 及之後**
+  1. 在設定介面或匣盤選單關閉「開機自動啟動」，這一步會刪除排程工作 `\TextDocumentCreator`
+  2. 從匣盤選單選「結束」
+  3. 刪除 exe 與同目錄的 `tdc_config.json`
+  4. 完成，登錄檔與系統中不會留下任何設定殘留
+- **2.0.0 及更早**
+  1. 從匣盤選單選「結束」
+  2. 刪除排程工作：以**管理員身分**開啟「命令提示字元」或「PowerShell」（開始功能表搜尋後按右鍵「以管理員身分執行」），執行下面的指令；需要管理員權限，否則會出現「拒絕存取」
+     ```bash
+     schtasks /Delete /TN TextDocumentCreator /F
+     ```
+     顯示「成功: 已成功刪除排程工作 "TextDocumentCreator"」即表示刪除完成；若顯示「系統找不到指定的檔案」，表示該工作本來就不存在，直接進行下一步
+  3. 開啟登錄編輯器，刪除 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
+  4. 若存在，刪除 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator` 值（最早兩版才有）
+  5. 刪除 exe
 
 ## 快速鍵
 
@@ -196,21 +214,3 @@ cargo build --release
 - 設定：登錄檔 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，全部是 `REG_DWORD`：`EnableCreate`、`EnableNotepad`、`AutoStart`、`VkCreate`、`ModCreate`、`VkNotepad`、`ModNotepad`、`VkSwitchCreate`、`ModSwitchCreate`、`VkSwitchNotepad`、`ModSwitchNotepad`、`Language`、`LanguageAuto`、`ThemeMode`
 - 開機自動啟動：排程工作 `TextDocumentCreator`；最早的兩版沒有排程工作，只寫 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator` 值（內容為 exe 完整路徑）
 - 這些舊版沒有設定檔，升級到 2.1.0 後首次執行會重新寫出出廠設定，舊登錄檔項不再被讀取
-
-## 解除安裝
-
-- **2.1.0 及之後**
-  1. 在設定介面或匣盤選單關閉「開機自動啟動」，這一步會刪除排程工作 `\TextDocumentCreator`
-  2. 從匣盤選單選「結束」
-  3. 刪除 exe 與同目錄的 `tdc_config.json`
-  4. 完成，登錄檔與系統中不會留下任何設定殘留
-- **2.0.0 及更早**
-  1. 從匣盤選單選「結束」
-  2. 刪除排程工作：以**管理員身分**開啟「命令提示字元」或「PowerShell」（開始功能表搜尋後按右鍵「以管理員身分執行」），執行下面的指令；需要管理員權限，否則會出現「拒絕存取」
-     ```bash
-     schtasks /Delete /TN TextDocumentCreator /F
-     ```
-     顯示「成功: 已成功刪除排程工作 "TextDocumentCreator"」即表示刪除完成；若顯示「系統找不到指定的檔案」，表示該工作本來就不存在，直接進行下一步
-  3. 開啟登錄編輯器，刪除 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
-  4. 若存在，刪除 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator` 值（最早兩版才有）
-  5. 刪除 exe

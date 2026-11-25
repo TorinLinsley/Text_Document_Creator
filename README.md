@@ -18,15 +18,22 @@
 - **高 DPI 自适应**：Per-Monitor V2，125% / 150% 下文字清晰；运行中修改缩放或分辨率实时重排
 - **轻量**：exe 约 508 KB；只驻留托盘、未打开设置界面且静止时，专用工作集仅约 **280 KB**，打开设置界面后私有内存约 1.5 MB
 
-## 下载安装
+## 使用
 
-### 直接下载
+1. 双击运行，程序驻留托盘（启动时不显示窗口）
+2. 按 `Win+F`：在**当前聚焦的资源管理器目录**中创建 `新建文本文档.txt`，已存在则依次为 `新建文本文档_1.txt`、`_2`…；焦点在桌面时创建到桌面
+3. 按 `Win+J`：每次都在新窗口打开记事本，连续按下可同时打开多个，从按下到窗口出现约 0.15 秒
+4. 左键单击托盘图标打开设置：开关功能、绑定快捷键、切换语言与主题、查看关于
+
+### 下载安装
+
+#### 直接下载
 
 1. 打开 [Releases](https://github.com/TorinLinsley/Text_Document_Creator/releases) 下载最新的 `text_document_creator_版本号.exe`
 2. 放到任意目录（例如 `D:\Tools\TextDocumentCreator`），双击即可运行
 3. 无需安装，也不需要 .NET 或 VC++ 运行库
 
-### 自行编译
+#### 自行编译
 
 ```bash
 git clone https://github.com/TorinLinsley/Text_Document_Creator.git
@@ -36,18 +43,29 @@ cargo build --release
 
 需要 Rust 工具链（MSVC 目标）与 Windows SDK，产物为 `target\release\text_document_creator_版本号.exe`。
 
-### 首次运行
+#### 首次运行
 
 - 启动后不会弹窗，图标直接出现在托盘，左键单击打开设置界面
 - 出厂默认只开启「创建文本文档」，「打开记事本」与「开机自启动」默认关闭，需要时在设置界面或托盘菜单里自行打开
 - 卸载：见下方「[卸载](#卸载)」
 
-## 使用
+### 卸载
 
-1. 双击运行，程序驻留托盘（启动时不显示窗口）
-2. 按 `Win+F`：在**当前聚焦的资源管理器目录**中创建 `新建文本文档.txt`，已存在则依次为 `新建文本文档_1.txt`、`_2`…；焦点在桌面时创建到桌面
-3. 按 `Win+J`：每次都在新窗口打开记事本，连续按下可同时打开多个，从按下到窗口出现约 0.15 秒
-4. 左键单击托盘图标打开设置：开关功能、绑定快捷键、切换语言与主题、查看关于
+- **2.1.0 及以后**
+  1. 在设置界面或托盘菜单里关掉「开机自启动」，这一步会删除计划任务 `\TextDocumentCreator`
+  2. 从托盘菜单选「退出」
+  3. 删除 exe 和同目录的 `tdc_config.json`
+  4. 完成，注册表和系统里不留任何设置残留
+- **2.0.0 及更早**
+  1. 从托盘菜单选「退出」
+  2. 删除计划任务：以**管理员身份**打开「命令提示符」或「PowerShell」（开始菜单搜索后右键「以管理员身份运行」），执行下面的命令；需要管理员权限，否则会报「拒绝访问」
+     ```bash
+     schtasks /Delete /TN TextDocumentCreator /F
+     ```
+     提示「成功: 已成功删除计划任务 "TextDocumentCreator"」即表示删除完成；如果提示「系统找不到指定的文件」，说明该任务本来就不存在，直接进行下一步
+  3. 打开注册表编辑器，删除 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
+  4. 若存在，删除 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator` 值（最早两版才有）
+  5. 删除 exe
 
 ## 快捷键
 
@@ -196,21 +214,3 @@ cargo build --release
 - 设置：注册表 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，全部是 `REG_DWORD` 值：`EnableCreate`、`EnableNotepad`、`AutoStart`、`VkCreate`、`ModCreate`、`VkNotepad`、`ModNotepad`、`VkSwitchCreate`、`ModSwitchCreate`、`VkSwitchNotepad`、`ModSwitchNotepad`、`Language`、`LanguageAuto`、`ThemeMode`
 - 开机自启动：计划任务 `TextDocumentCreator`；最早的两版没有任务，只写 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator` 值（内容为 exe 完整路径）
 - 这些旧版没有配置文件，升级到 2.1.0 后首次运行会读不到 `tdc_config.json`，按出厂值重建，旧注册表项不再被使用
-
-## 卸载
-
-- **2.1.0 及以后**
-  1. 在设置界面或托盘菜单里关掉「开机自启动」，这一步会删除计划任务 `\TextDocumentCreator`
-  2. 从托盘菜单选「退出」
-  3. 删除 exe 和同目录的 `tdc_config.json`
-  4. 完成，注册表和系统里不留任何设置残留
-- **2.0.0 及更早**
-  1. 从托盘菜单选「退出」
-  2. 删除计划任务：以**管理员身份**打开「命令提示符」或「PowerShell」（开始菜单搜索后右键「以管理员身份运行」），执行下面的命令；需要管理员权限，否则会报「拒绝访问」
-     ```bash
-     schtasks /Delete /TN TextDocumentCreator /F
-     ```
-     提示「成功: 已成功删除计划任务 "TextDocumentCreator"」即表示删除完成；如果提示「系统找不到指定的文件」，说明该任务本来就不存在，直接进行下一步
-  3. 打开注册表编辑器，删除 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
-  4. 若存在，删除 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator` 值（最早两版才有）
-  5. 删除 exe

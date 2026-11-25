@@ -18,15 +18,22 @@ The settings window is not assembled from stock controls but drawn from scratch:
 - **High DPI aware**: Per-Monitor V2, crisp text at 125% / 150%, live reflow when scaling or resolution changes
 - **Lightweight**: about 508 KB exe; sitting in the tray with no settings window open and nothing happening costs about **280 KB** of private working set, and about 1.5 MB private memory once the settings window is open
 
-## Download and install
+## Usage
 
-### Download the exe
+1. Double click to run; the app stays in the tray and shows no window on startup
+2. Press `Win+F`: creates `新建文本文档.txt` in the **currently focused Explorer folder**, or `新建文本文档_1.txt`, `_2`... when it already exists; when the desktop is focused the file is created there
+3. Press `Win+J`: opens Notepad in a new window every time, so several can be opened at once; about 0.15 s from key press to window
+4. Left click the tray icon to open the settings: toggle features, bind shortcuts, switch language and theme, or read About
+
+### Download and install
+
+#### Download the exe
 
 1. Open [Releases](https://github.com/TorinLinsley/Text_Document_Creator/releases) and download the latest `text_document_creator_版本号.exe`
 2. Put it in any folder (for example `D:\Tools\TextDocumentCreator`) and double click it
 3. Nothing to install, no .NET or VC++ runtime required
 
-### Build from source
+#### Build from source
 
 ```bash
 git clone https://github.com/TorinLinsley/Text_Document_Creator.git
@@ -36,18 +43,29 @@ cargo build --release
 
 This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `target\release\text_document_creator.exe`.
 
-### First run
+#### First run
 
 - No window appears on startup: the icon simply shows up in the tray, and a left click opens the settings
 - Out of the box only "Create text file" is enabled; "Open Notepad" and "Run at startup" are off until you turn them on in the settings or the tray menu
 - To uninstall: see [Uninstall](#uninstall)
 
-## Usage
+### Uninstall
 
-1. Double click to run; the app stays in the tray and shows no window on startup
-2. Press `Win+F`: creates `新建文本文档.txt` in the **currently focused Explorer folder**, or `新建文本文档_1.txt`, `_2`... when it already exists; when the desktop is focused the file is created there
-3. Press `Win+J`: opens Notepad in a new window every time, so several can be opened at once; about 0.15 s from key press to window
-4. Left click the tray icon to open the settings: toggle features, bind shortcuts, switch language and theme, or read About
+- **2.1.0 and later**
+  1. Turn "Run at startup" off in the settings window or the tray menu; this deletes the `\TextDocumentCreator` scheduled task
+  2. Choose Exit in the tray menu
+  3. Delete the exe and `tdc_config.json` in the same folder
+  4. Done, nothing is left in the registry or anywhere else
+- **2.0.0 and earlier**
+  1. Choose Exit in the tray menu
+  2. Delete the scheduled task: open Command Prompt or PowerShell **as administrator** (search it in the Start menu, then choose Run as administrator) and run the command below; administrator rights are required, otherwise it fails with "Access is denied"
+     ```bash
+     schtasks /Delete /TN TextDocumentCreator /F
+     ```
+     "SUCCESS: The scheduled task \"TextDocumentCreator\" was successfully deleted." means it is gone; "ERROR: The system cannot find the file specified." means the task never existed, so continue with the next step
+  3. Open Registry Editor and delete `HKEY_CURRENT_USER\Software\TextDocumentCreator`
+  4. If it exists, delete the `Text_Document_Creator` value under `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` (only the two earliest releases)
+  5. Delete the exe
 
 ## Shortcuts
 
@@ -196,21 +214,3 @@ Available `language` codes:
 - Settings: registry `HKEY_CURRENT_USER\Software\TextDocumentCreator`, all `REG_DWORD`: `EnableCreate`, `EnableNotepad`, `AutoStart`, `VkCreate`, `ModCreate`, `VkNotepad`, `ModNotepad`, `VkSwitchCreate`, `ModSwitchCreate`, `VkSwitchNotepad`, `ModSwitchNotepad`, `Language`, `LanguageAuto`, `ThemeMode`
 - Run at startup: the `TextDocumentCreator` scheduled task; the two earliest releases had no task and written the `Text_Document_Creator` value under `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` (the exe path)
 - Those versions have no config file, so the first run of 2.1.0 writes factory defaults and the old registry keys are no longer read
-
-## Uninstall
-
-- **2.1.0 and later**
-  1. Turn "Run at startup" off in the settings window or the tray menu; this deletes the `\TextDocumentCreator` scheduled task
-  2. Choose Exit in the tray menu
-  3. Delete the exe and `tdc_config.json` in the same folder
-  4. Done, nothing is left in the registry or anywhere else
-- **2.0.0 and earlier**
-  1. Choose Exit in the tray menu
-  2. Delete the scheduled task: open Command Prompt or PowerShell **as administrator** (search it in the Start menu, then choose Run as administrator) and run the command below; administrator rights are required, otherwise it fails with "Access is denied"
-     ```bash
-     schtasks /Delete /TN TextDocumentCreator /F
-     ```
-     "SUCCESS: The scheduled task \"TextDocumentCreator\" was successfully deleted." means it is gone; "ERROR: The system cannot find the file specified." means the task never existed, so continue with the next step
-  3. Open Registry Editor and delete `HKEY_CURRENT_USER\Software\TextDocumentCreator`
-  4. If it exists, delete the `Text_Document_Creator` value under `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` (only the two earliest releases)
-  5. Delete the exe
