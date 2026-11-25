@@ -199,5 +199,5 @@ cargo build --release
 
 ## 卸载
 
-- **2.1.0 及以后**：托盘菜单「退出」，先关掉「开机自启动」（会删除计划任务），然后删除 exe 和同目录的 `tdc_config.json` 即可，注册表和系统里不留任何设置残留
+- **2.1.0 及以后**：先在设置界面或托盘菜单里关掉「开机自启动」（会删除计划任务），再从托盘菜单「退出」，最后删除 exe 和同目录的 `tdc_config.json`，注册表和系统里不留任何设置残留
 - **2.0.0 及更早**：设置写在注册表 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，自启动登记在计划任务 `TextDocumentCreator`（最早的版本写在 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 的 `Text_Document_Creator` 值里）。退出程序后执行 `schtasks /Delete /TN TextDocumentCreator /F`，再用注册表编辑器删除上面两项，才是彻底清除

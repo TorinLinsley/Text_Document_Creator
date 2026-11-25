@@ -199,5 +199,5 @@ Available `language` codes:
 
 ## Uninstall
 
-- **2.1.0 and later**: choose Exit in the tray menu, turn "Run at startup" off first (that removes the scheduled task), then delete the exe and `tdc_config.json` in the same folder. Nothing is left in the registry or anywhere else.
+- **2.1.0 and later**: turn "Run at startup" off first in the settings window or the tray menu (that removes the scheduled task), then choose Exit in the tray menu, and finally delete the exe and `tdc_config.json` in the same folder. Nothing is left in the registry or anywhere else.
 - **2.0.0 and earlier**: settings lived in the registry key `HKEY_CURRENT_USER\Software\TextDocumentCreator`, and startup was registered as the `TextDocumentCreator` scheduled task (the very first builds used the `Text_Document_Creator` value under `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run`). Exit the app, run `schtasks /Delete /TN TextDocumentCreator /F`, then delete those registry entries to clean up completely.

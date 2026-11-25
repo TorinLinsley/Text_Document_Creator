@@ -199,5 +199,5 @@ cargo build --release
 
 ## 解除安裝
 
-- **2.1.0 及之後**：匣盤選單「結束」，先關閉「開機自動啟動」（會刪除排程工作），再刪除 exe 與同目錄的 `tdc_config.json`，登錄檔與系統中不會留下任何設定殘留
+- **2.1.0 及之後**：先在設定介面或匣盤選單關閉「開機自動啟動」（會刪除排程工作），再從匣盤選單「結束」，最後刪除 exe 與同目錄的 `tdc_config.json`，登錄檔與系統中不會留下任何設定殘留
 - **2.0.0 及更早**：設定寫在登錄檔 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，開機自動啟動登記為排程工作 `TextDocumentCreator`（最早的版本寫在 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 的 `Text_Document_Creator` 值）。結束程式後執行 `schtasks /Delete /TN TextDocumentCreator /F`，再用登錄編輯器刪除上述兩項，才算徹底清除
