@@ -161,18 +161,32 @@ cargo build --release
 
 ## 專案結構
 
-| 檔案 | 作用 |
+| 路徑 | 作用 |
 | --- | --- |
-| `src/main.rs` | 視窗建立、訊息迴圈、匣盤、DPI 與主題變化、單一執行個體 |
-| `src/app.rs` | 設定介面版面、命中測試、繪製與互動 |
-| `src/render.rs` | 純 GDI 繪製層（文字、圓角、漸層、陰影、圖示） |
-| `src/theme.rs` | 深淺色調色盤、顏色混合與系統主題判定 |
-| `src/anim.rs` | 指數趨近動畫 |
-| `src/i18n.rs` | 20 種語言文案與系統語言偵測 |
-| `src/config.rs` | JSON 設定檔讀寫與開機自動啟動登記 |
-| `src/hotkey.rs` | 全域鍵盤鉤子、按鍵綁定、建檔案與開記事本 |
-| `src/ffi.rs` / `src/sys.rs` | Win32 常數與 API 宣告 |
-
+| `src/` | 全部 Rust 原始碼，零第三方相依，Win32 全部手寫 FFI |
+| `src/main.rs` | 程式入口、視窗與訊息迴圈、匣盤圖示、單一實例、DPI 與主題變化、閒置記憶體回收 |
+| `src/app.rs` | 設定介面：版面、命中測試、繪製、語言下拉與捲動、關於頁面、文字選取 |
+| `src/render.rs` | 純 GDI 繪製層：文字、圓角、漸層、陰影、圖示、裁剪 |
+| `src/theme.rs` | 深淺色調色盤、顏色混合、系統主題判定與主題轉場插值 |
+| `src/anim.rs` | 指數逼近動畫與速度控制 |
+| `src/i18n.rs` | 20 種語言文案、語言代碼表與系統語言偵測 |
+| `src/config.rs` | `tdc_config.json` 讀寫、出廠預設值、開機自動啟動排程工作登記 |
+| `src/hotkey.rs` | 全域鍵盤鉤子執行緒、按鍵擷取與綁定、建立文字文件、啟動記事本 |
+| `src/ffi.rs` | Win32 常數與 user32 / kernel32 / shell32 等 API 宣告 |
+| `src/sys.rs` | 結構定義與其餘 API 宣告（登錄檔、排程工作、COM、匣盤、處理程序） |
+| `assets/` | 圖示資源 |
+| `assets/icon.ico` | 編譯進 exe 的圖示，16 / 20 / 24 / 32 / 40 / 48 / 64 / 128 / 256 共 9 個尺寸 |
+| `assets/icon_source.png` | 圖示的原始 256×256 PNG |
+| `tools/` | 建置輔助腳本 |
+| `tools/build_icon.mjs` | 從 `icon_source.png` 重新產生 `icon.ico`（Node 執行，無第三方相依） |
+| `build.rs` | 建置腳本：尋找 Windows SDK 的 `rc.exe`，編譯 `app.rc` 並連結進 exe |
+| `app.rc` | 圖示、資訊清單與 8 種語言的版本資訊資源 |
+| `app.manifest` | `requireAdministrator`、Per-Monitor V2 DPI、Common Controls 6、longPathAware、UTF-8 代碼頁 |
+| `.cargo/config.toml` | 靜態 CRT 與連結最佳化參數 |
+| `Cargo.toml` / `Cargo.lock` | 套件資訊、release 最佳化設定與鎖定檔 |
+| `README.md` / `README-EN.md` / `README-HK.md` | 簡體、英文、繁體說明 |
+| `LICENSE` | LGPL v2.1 |
+| `.gitignore` | 忽略 `target/`、建置中間產物與本機腳本 |
 ## 資料位置
 
 ### 2.1.0 及之後

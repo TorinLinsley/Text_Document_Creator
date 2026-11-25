@@ -161,17 +161,32 @@ Output: `target\release\text_document_creator.exe`
 
 ## Project layout
 
-| File | Responsibility |
+| Path | Purpose |
 | --- | --- |
-| `src/main.rs` | Window creation, message loop, tray, DPI and theme changes, single instance |
-| `src/app.rs` | Settings layout, hit testing, painting and interaction |
-| `src/render.rs` | Pure GDI drawing (text, rounded shapes, gradients, shadows, icons) |
-| `src/theme.rs` | Dark and light palettes, colour blending and system theme detection |
-| `src/anim.rs` | Exponential-approach animation |
-| `src/i18n.rs` | Text for 20 languages and system language detection |
-| `src/config.rs` | JSON settings file and run-at-startup registration |
-| `src/hotkey.rs` | Global hook, key binding, file creation and Notepad launch |
-| `src/ffi.rs` / `src/sys.rs` | Win32 constants and API declarations |
+| `src/` | All Rust sources, no third-party crates, Win32 declared by hand |
+| `src/main.rs` | Entry point, window and message loop, tray icon, single instance, DPI and theme changes, idle memory trimming |
+| `src/app.rs` | Settings UI: layout, hit testing, painting, language dropdown and scrolling, About page, text selection |
+| `src/render.rs` | Pure GDI painting: text, rounded corners, gradients, shadows, icons, clipping |
+| `src/theme.rs` | Light and dark palettes, colour mixing, system theme detection and transition interpolation |
+| `src/anim.rs` | Exponential approach animation and speed control |
+| `src/i18n.rs` | Strings for 20 languages, locale codes and system language detection |
+| `src/config.rs` | Reads and writes `tdc_config.json`, factory defaults, autostart scheduled task |
+| `src/hotkey.rs` | Global keyboard hook thread, key capture and binding, text file creation, Notepad launch |
+| `src/ffi.rs` | Win32 constants and user32 / kernel32 / shell32 declarations |
+| `src/sys.rs` | Structures and the remaining declarations (registry, scheduled task, COM, tray, processes) |
+| `assets/` | Icon assets |
+| `assets/icon.ico` | Icon compiled into the exe: 16 / 20 / 24 / 32 / 40 / 48 / 64 / 128 / 256, nine sizes |
+| `assets/icon_source.png` | Source 256×256 PNG of the icon |
+| `tools/` | Build helper scripts |
+| `tools/build_icon.mjs` | Rebuilds `icon.ico` from `icon_source.png` (plain Node, no dependencies) |
+| `build.rs` | Build script: locates the Windows SDK `rc.exe`, compiles `app.rc` and links it into the exe |
+| `app.rc` | Icon, manifest and version resources in 8 languages |
+| `app.manifest` | `requireAdministrator`, Per-Monitor V2 DPI, Common Controls 6, longPathAware, UTF-8 code page |
+| `.cargo/config.toml` | Static CRT and linker options |
+| `Cargo.toml` / `Cargo.lock` | Package metadata, release profile and lock file |
+| `README.md` / `README-EN.md` / `README-HK.md` | Simplified Chinese, English and Traditional Chinese docs |
+| `LICENSE` | LGPL v2.1 |
+| `.gitignore` | Ignores `target/`, build intermediates and local scripts |
 
 ## Data locations
 
