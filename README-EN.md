@@ -38,8 +38,8 @@ This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `
 ### First run
 
 - No window appears on startup: the icon simply shows up in the tray, and a left click opens the settings
-- Enable "Run at startup" in the settings or the tray menu when needed
-- To uninstall completely, choose Exit in the tray menu and delete the exe; to remove the settings as well, delete the registry key `HKEY_CURRENT_USER\Software\TextDocumentCreator` and `Text_Document_Creator` under `Run`
+- Out of the box only "Create text file" is enabled; "Open Notepad" and "Run at startup" are off until you turn them on in the settings or the tray menu
+- To uninstall completely, choose Exit in the tray menu and delete the exe; to remove the settings as well, delete the registry key `HKEY_CURRENT_USER\Software\TextDocumentCreator` and remove the `TextDocumentCreator` scheduled task (`schtasks /Delete /TN TextDocumentCreator /F`)
 
 ## Usage
 
@@ -157,4 +157,4 @@ Output: `target\release\text_document_creator.exe`
 ## Data locations
 
 - Settings: `HKEY_CURRENT_USER\Software\TextDocumentCreator`
-- Run at startup: `Text_Document_Creator` under `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run`
+- Run at startup: the `\TextDocumentCreator` scheduled task (`ONLOGON` with highest privileges, so logon is silent and shows no UAC prompt; turning the switch off deletes it)

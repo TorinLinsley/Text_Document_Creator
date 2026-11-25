@@ -5,7 +5,6 @@ use crate::ffi::*;
 use crate::hotkey;
 use crate::i18n::{self, Lang};
 use crate::render::{Align, Canvas, Gfx, icon_image};
-use crate::sys;
 use crate::theme::*;
 
 pub const ID_MIN: u32 = 1;

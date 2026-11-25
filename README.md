@@ -38,8 +38,8 @@ cargo build --release
 ### 首次运行
 
 - 启动后不会弹窗，图标直接出现在托盘，左键单击打开设置界面
-- 需要开机自动启动时，在设置界面或托盘菜单里打开「开机自启动」
-- 彻底卸载：托盘菜单「退出」，删除 exe；如需清理设置，删除注册表项 `HKEY_CURRENT_USER\Software\TextDocumentCreator` 与 `Run` 下的 `Text_Document_Creator`
+- 出厂默认只开启「创建文本文档」，「打开记事本」与「开机自启动」默认关闭，需要时在设置界面或托盘菜单里自行打开
+- 彻底卸载：托盘菜单「退出」，删除 exe；如需清理设置，删除注册表项 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，并删除计划任务 `TextDocumentCreator`（`schtasks /Delete /TN TextDocumentCreator /F`）
 
 ## 使用
 
@@ -157,4 +157,4 @@ cargo build --release
 ## 数据位置
 
 - 设置：`HKEY_CURRENT_USER\Software\TextDocumentCreator`
-- 开机自启动：`HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator`
+- 开机自启动：计划任务 `\TextDocumentCreator`（`ONLOGON` + 最高权限，登录时静默启动、不弹 UAC；关闭开关会删除该任务）

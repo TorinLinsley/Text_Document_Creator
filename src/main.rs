@@ -51,7 +51,7 @@ unsafe fn run() {
         }
         return;
     }
-    config::migrate_autostart();
+    config::startup_sync();
     let class = w(CLASS_NAME);
     let icon = LoadImageW(instance, 1 as *const u16, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
     let small = LoadImageW(instance, 1 as *const u16, IMAGE_ICON, 16, 16, LR_SHARED);

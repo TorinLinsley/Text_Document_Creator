@@ -39,7 +39,7 @@ cargo build --release
 
 - 啟動後不會彈窗，圖示直接出現在匣盤，左鍵單擊開啟設定介面
 - 需要開機自動啟動時，在設定介面或匣盤選單中開啟「開機自動啟動」
-- 徹底解除安裝：匣盤選單「結束」，刪除 exe；如需清除設定，刪除登錄檔項目 `HKEY_CURRENT_USER\Software\TextDocumentCreator` 與 `Run` 下的 `Text_Document_Creator`
+- 徹底解除安裝：匣盤選單「結束」，刪除 exe；如需清除設定，刪除登錄檔項目 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，並刪除排程工作 `TextDocumentCreator`（`schtasks /Delete /TN TextDocumentCreator /F`）
 
 ## 使用
 
@@ -157,4 +157,4 @@ cargo build --release
 ## 資料位置
 
 - 設定：`HKEY_CURRENT_USER\Software\TextDocumentCreator`
-- 開機自動啟動：`HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator`
+- 開機自動啟動：排程工作 `\TextDocumentCreator`（`ONLOGON` + 最高權限，登入時靜默啟動、不彈 UAC；關閉開關會刪除該工作）

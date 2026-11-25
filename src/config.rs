@@ -59,7 +59,7 @@ impl Settings {
         let mut s = Settings::defaults();
         s.enable_create = read_dword("EnableCreate", 1) != 0;
         s.enable_notepad = read_dword("EnableNotepad", 0) != 0;
-        s.autostart = autostart_registered();
+        s.autostart = read_dword("AutoStart", 0) != 0;
         s.vk_create = read_dword("VkCreate", s.vk_create);
         s.mod_create = read_dword("ModCreate", s.mod_create);
         s.vk_notepad = read_dword("VkNotepad", s.vk_notepad);
@@ -130,12 +130,16 @@ impl Settings {
     }
 }
 
-pub fn migrate_autostart() {
-    if !legacy_run_present() {
-        return;
+impl Settings {
+    pub fn reconcile_autostart(&self) {
+        if self.autostart != autostart_registered() {
+            self.apply_autostart();
+        }
     }
-    let settings = Settings::load();
-    settings.apply_autostart();
+}
+
+pub fn startup_sync() {
+    Settings::load().reconcile_autostart();
 }
 
 const TASK_NAME: &str = "TextDocumentCreator";
