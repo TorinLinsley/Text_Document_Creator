@@ -207,7 +207,7 @@ cargo build --release
 - **2.0.0 及更早**
   1. 從匣盤選單選「結束」
   2. 刪除排程工作：以**管理員身分**開啟「命令提示字元」或「PowerShell」（開始功能表搜尋後按右鍵「以管理員身分執行」），執行下面的指令；需要管理員權限，否則會出現「拒絕存取」
-     ```bat
+     ```bash
      schtasks /Delete /TN TextDocumentCreator /F
      ```
      顯示「成功: 已成功刪除排程工作 "TextDocumentCreator"」即表示刪除完成；若顯示「系統找不到指定的檔案」，表示該工作本來就不存在，直接進行下一步

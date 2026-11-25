@@ -207,7 +207,7 @@ Available `language` codes:
 - **2.0.0 and earlier**
   1. Choose Exit in the tray menu
   2. Delete the scheduled task: open Command Prompt or PowerShell **as administrator** (search it in the Start menu, then choose Run as administrator) and run the command below; administrator rights are required, otherwise it fails with "Access is denied"
-     ```bat
+     ```bash
      schtasks /Delete /TN TextDocumentCreator /F
      ```
      "SUCCESS: The scheduled task \"TextDocumentCreator\" was successfully deleted." means it is gone; "ERROR: The system cannot find the file specified." means the task never existed, so continue with the next step

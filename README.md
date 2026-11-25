@@ -207,7 +207,7 @@ cargo build --release
 - **2.0.0 及更早**
   1. 从托盘菜单选「退出」
   2. 删除计划任务：以**管理员身份**打开「命令提示符」或「PowerShell」（开始菜单搜索后右键「以管理员身份运行」），执行下面的命令；需要管理员权限，否则会报「拒绝访问」
-     ```bat
+     ```bash
      schtasks /Delete /TN TextDocumentCreator /F
      ```
      提示「成功: 已成功删除计划任务 "TextDocumentCreator"」即表示删除完成；如果提示「系统找不到指定的文件」，说明该任务本来就不存在，直接进行下一步
