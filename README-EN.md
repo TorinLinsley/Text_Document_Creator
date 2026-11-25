@@ -185,7 +185,7 @@ Output: `target\release\text_document_creator.exe`
 | `.cargo/config.toml` | Static CRT and linker options |
 | `Cargo.toml` / `Cargo.lock` | Package metadata, release profile and lock file |
 | `README.md` / `README-EN.md` / `README-HK.md` | Simplified Chinese, English and Traditional Chinese docs |
-| `LICENSE` | Full text of the licence |
+| `LICENSE` | Full license agreement |
 
 ## Data locations
 

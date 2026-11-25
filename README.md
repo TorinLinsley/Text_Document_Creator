@@ -185,7 +185,7 @@ cargo build --release
 | `.cargo/config.toml` | 静态 CRT 与链接优化参数 |
 | `Cargo.toml` / `Cargo.lock` | 包信息、release 优化配置与锁定 |
 | `README.md` / `README-EN.md` / `README-HK.md` | 简体、英文、繁体说明 |
-| `LICENSE` | 授权条款全文 |
+| `LICENSE` | 协议全文 |
 ## 数据位置
 
 ### 2.1.0 及以后
