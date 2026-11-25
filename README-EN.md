@@ -16,7 +16,7 @@ The settings window is not assembled from stock controls but drawn from scratch:
 - **Modern UI**: hover, press, dropdown, toggle and theme transitions are all animated and interruptible
 - **20 UI languages**: follows the Windows system language on startup, the dropdown scrolls with the wheel and a manual choice is remembered
 - **High DPI aware**: Per-Monitor V2, crisp text at 125% / 150%, live reflow when scaling or resolution changes
-- **Lightweight**: about 508 KB exe; sitting idle in the tray it uses about **64-88 KB** of memory, and around 1 MB even with the settings window open
+- **Lightweight**: sitting idle in the tray it uses about **64-88 KB** of memory, and around 1 MB even with the settings window open
 
 ## Download, usage and uninstall
 
@@ -140,7 +140,6 @@ The program is one Win32 window, one tray icon and one global hook. It spawns no
 
 | Metric                                | Measured                                                                           |
 | ------------------------------------- | ---------------------------------------------------------------------------------- |
-| exe size                              | about 508 KB                                                                       |
 | Private bytes                         | about 1.5 MB                                                                       |
 | Tray resident, settings closed (idle) | about 64-88 KB                                                                     |
 | Settings open but idle                | about 0.1-0.3 MB                                                                   |
