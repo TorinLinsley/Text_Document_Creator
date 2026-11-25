@@ -41,7 +41,7 @@ This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `
 #### First run
 
 - No window appears on startup: the icon simply shows up in the tray, and a left click opens the settings
-- On first use, if no config file exists next to the exe, one is created there automatically (a dedicated folder is recommended, which keeps things tidy)
+- On first use, if this exe's folder has no config file, the first run creates one there automatically (a dedicated folder holding both the exe and its config file is recommended, which keeps things tidy)
 - Out of the box only "Create text file" is enabled; "Open Notepad" and "Run at startup" are off until you turn them on in the settings or the tray menu
 
 ### Usage
