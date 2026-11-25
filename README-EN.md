@@ -20,7 +20,7 @@ The settings window is not assembled from stock controls but drawn from scratch:
 
 ## Download, usage and uninstall
 
-### Download and install
+### Download
 
 #### Download the exe
 
