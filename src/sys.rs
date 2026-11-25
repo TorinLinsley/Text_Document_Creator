@@ -69,6 +69,8 @@ extern "system" {
     pub fn WaitForInputIdle(process: HANDLE, timeout: u32) -> u32;
     pub fn GetCurrentProcess() -> HANDLE;
     pub fn SetProcessWorkingSetSize(process: HANDLE, min: isize, max: isize) -> i32;
+    pub fn WaitForSingleObject(handle: HANDLE, timeout: u32) -> u32;
+    pub fn GetExitCodeProcess(process: HANDLE, code: *mut u32) -> i32;
 }
 
 #[link(name = "user32")]

@@ -115,28 +115,79 @@ impl Settings {
     }
 
     pub fn apply_autostart(&self) {
+        let exe = std::env::current_exe().map(|p| p.to_string_lossy().to_string()).unwrap_or_default();
         unsafe {
-            let sub = w(RUN_KEY);
-            let mut key: HKEY = 0;
-            if RegCreateKeyExW(HKEY_CURRENT_USER, sub.as_ptr(), 0, core::ptr::null(), 0, KEY_QUERY_VALUE | KEY_SET_VALUE, core::ptr::null_mut(), &mut key, core::ptr::null_mut()) != 0 {
-                return;
+        if self.autostart {
+            let args = format!("/Create /TN \"{}\" /TR \"\\\"{}\\\"\" /SC ONLOGON /RL HIGHEST /F", TASK_NAME, exe);
+            if !task_tool(&args) {
+                write_run_value(&exe);
             }
-            let name = w(RUN_NAME);
-            if self.autostart {
-                let exe = std::env::current_exe().map(|p| p.to_string_lossy().to_string()).unwrap_or_default();
-                let command = format!("\"{}\"", exe);
-                let data = w(&command);
-                let bytes = (data.len() - 1) * 2;
-                RegSetValueExW(key, name.as_ptr(), 0, REG_SZ, data.as_ptr() as *const u8, bytes as u32);
-            } else {
-                RegDeleteValueW(key, name.as_ptr());
-            }
-            RegCloseKey(key);
+        } else {
+            task_tool(&format!("/Delete /TN \"{}\" /F", TASK_NAME));
+        }
+        remove_run_value();
         }
     }
 }
 
-fn autostart_registered() -> bool {
+pub fn migrate_autostart() {
+    if !legacy_run_present() {
+        return;
+    }
+    let settings = Settings::load();
+    settings.apply_autostart();
+}
+
+const TASK_NAME: &str = "TextDocumentCreator";
+const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+
+unsafe fn task_tool(args: &str) -> bool {
+    let mut info: crate::sys::STARTUPINFOW = core::mem::zeroed();
+    info.cb = core::mem::size_of::<crate::sys::STARTUPINFOW>() as u32;
+    let mut process: crate::sys::PROCESS_INFORMATION = core::mem::zeroed();
+    let line = w(&format!("schtasks.exe {}", args));
+    let created = crate::sys::CreateProcessW(core::ptr::null(), line.as_ptr(), core::ptr::null(), core::ptr::null(), 0, CREATE_NO_WINDOW, core::ptr::null(), core::ptr::null(), &mut info, &mut process);
+    if created == 0 {
+        return false;
+    }
+    crate::sys::WaitForSingleObject(process.hProcess, 10000);
+    let mut code: u32 = 1;
+    crate::sys::GetExitCodeProcess(process.hProcess, &mut code);
+    CloseHandle(process.hProcess);
+    CloseHandle(process.hThread);
+    code == 0
+}
+
+unsafe fn task_present() -> bool {
+    task_tool(&format!("/Query /TN \"{}\"", TASK_NAME))
+}
+
+unsafe fn write_run_value(exe: &str) {
+    let sub = w(RUN_KEY);
+    let mut key: HKEY = 0;
+    if RegCreateKeyExW(HKEY_CURRENT_USER, sub.as_ptr(), 0, core::ptr::null(), 0, KEY_QUERY_VALUE | KEY_SET_VALUE, core::ptr::null_mut(), &mut key, core::ptr::null_mut()) != 0 {
+        return;
+    }
+    let name = w(RUN_NAME);
+    let command = format!("\"{}\"", exe);
+    let data = w(&command);
+    let bytes = (data.len() - 1) * 2;
+    RegSetValueExW(key, name.as_ptr(), 0, REG_SZ, data.as_ptr() as *const u8, bytes as u32);
+    RegCloseKey(key);
+}
+
+unsafe fn remove_run_value() {
+    let sub = w(RUN_KEY);
+    let mut key: HKEY = 0;
+    if RegCreateKeyExW(HKEY_CURRENT_USER, sub.as_ptr(), 0, core::ptr::null(), 0, KEY_QUERY_VALUE | KEY_SET_VALUE, core::ptr::null_mut(), &mut key, core::ptr::null_mut()) != 0 {
+        return;
+    }
+    let name = w(RUN_NAME);
+    RegDeleteValueW(key, name.as_ptr());
+    RegCloseKey(key);
+}
+
+fn legacy_run_present() -> bool {
     unsafe {
         let sub = w(RUN_KEY);
         let mut key: HKEY = 0;
@@ -150,6 +201,10 @@ fn autostart_registered() -> bool {
         RegCloseKey(key);
         status == 0 && size > 0
     }
+}
+
+fn autostart_registered() -> bool {
+    unsafe { task_present() || legacy_run_present() }
 }
 
 fn read_dword(name: &str, fallback: u32) -> u32 {
