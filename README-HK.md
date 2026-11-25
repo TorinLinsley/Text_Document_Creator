@@ -185,8 +185,7 @@ cargo build --release
 | `.cargo/config.toml` | 靜態 CRT 與連結最佳化參數 |
 | `Cargo.toml` / `Cargo.lock` | 套件資訊、release 最佳化設定與鎖定檔 |
 | `README.md` / `README-EN.md` / `README-HK.md` | 簡體、英文、繁體說明 |
-| `LICENSE` | LGPL v2.1 |
-| `.gitignore` | 忽略 `target/`、建置中間產物與本機腳本 |
+| `LICENSE` | 授權條款全文 |
 ## 資料位置
 
 ### 2.1.0 及之後

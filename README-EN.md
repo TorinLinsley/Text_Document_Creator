@@ -185,8 +185,7 @@ Output: `target\release\text_document_creator.exe`
 | `.cargo/config.toml` | Static CRT and linker options |
 | `Cargo.toml` / `Cargo.lock` | Package metadata, release profile and lock file |
 | `README.md` / `README-EN.md` / `README-HK.md` | Simplified Chinese, English and Traditional Chinese docs |
-| `LICENSE` | LGPL v2.1 |
-| `.gitignore` | Ignores `target/`, build intermediates and local scripts |
+| `LICENSE` | Full text of the licence |
 
 ## Data locations
 
