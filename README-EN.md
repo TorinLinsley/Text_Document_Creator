@@ -157,6 +157,8 @@ Output: `target\release\text_document_creator.exe`
 
 ## Data locations
 
+### 2.1.0 and later
+
 - Settings: `tdc_config.json` next to the exe (factory values are written on first run, every change is saved immediately, and you can edit the file by hand and restart the app)
 
 Fields:
@@ -187,8 +189,13 @@ Available `language` codes:
 | `de_de` | Deutsch | `th_th` | ไทย |
 | `es_es` | Español | `hi_in` | हिन्दी |
 | `it_it` | Italiano | | |
-- Legacy note: versions 2.0.0 and earlier kept the same settings in `HKEY_CURRENT_USER\Software\TextDocumentCreator`
 - Run at startup: the `\TextDocumentCreator` scheduled task (`ONLOGON` with highest privileges, so logon is silent and shows no UAC prompt; turning the switch off deletes it)
+
+### 2.0.0 and earlier
+
+- Settings: registry `HKEY_CURRENT_USER\Software\TextDocumentCreator`, all `REG_DWORD`: `EnableCreate`, `EnableNotepad`, `AutoStart`, `VkCreate`, `ModCreate`, `VkNotepad`, `ModNotepad`, `VkSwitchCreate`, `ModSwitchCreate`, `VkSwitchNotepad`, `ModSwitchNotepad`, `Language`, `LanguageAuto`, `ThemeMode`
+- Run at startup: the `TextDocumentCreator` scheduled task; the two earliest releases had no task and written the `Text_Document_Creator` value under `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` (the exe path)
+- Those versions have no config file, so the first run of 2.1.0 writes factory defaults and the old registry keys are no longer read
 
 ## Uninstall
 

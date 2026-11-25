@@ -157,6 +157,8 @@ cargo build --release
 
 ## 資料位置
 
+### 2.1.0 及之後
+
 - 設定：exe 同目錄的 `tdc_config.json`（首次執行時寫出出廠設定，之後每次修改即時寫回；也可以直接編輯這個檔案，重新啟動程式後生效）
 
 欄位說明：
@@ -187,8 +189,13 @@ cargo build --release
 | `de_de` | Deutsch | `th_th` | ไทย |
 | `es_es` | Español | `hi_in` | हिन्दी |
 | `it_it` | Italiano | | |
-- 舊版說明：2.0.0 及更早的版本把同樣的設定放在登錄檔 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
 - 開機自動啟動：排程工作 `\TextDocumentCreator`（`ONLOGON` + 最高權限，登入時靜默啟動、不彈 UAC；關閉開關會刪除該工作）
+
+### 2.0.0 及更早
+
+- 設定：登錄檔 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，全部是 `REG_DWORD`：`EnableCreate`、`EnableNotepad`、`AutoStart`、`VkCreate`、`ModCreate`、`VkNotepad`、`ModNotepad`、`VkSwitchCreate`、`ModSwitchCreate`、`VkSwitchNotepad`、`ModSwitchNotepad`、`Language`、`LanguageAuto`、`ThemeMode`
+- 開機自動啟動：排程工作 `TextDocumentCreator`；最早的兩版沒有排程工作，只寫 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator` 值（內容為 exe 完整路徑）
+- 這些舊版沒有設定檔，升級到 2.1.0 後首次執行會重新寫出出廠設定，舊登錄檔項不再被讀取
 
 ## 解除安裝
 
