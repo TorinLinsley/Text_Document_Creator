@@ -10,7 +10,7 @@
 
 - **单文件 exe**：静态链接 CRT，只依赖 `user32` / `gdi32` / `dwmapi` / `shell32` / `advapi32` / `uxtheme` / `ole32`，复制到任意 Windows 10/11 机器即可运行
 - **单进程**：没有子进程、没有额外的宿主进程；任务管理器「进程」与「详细信息」里只有一个进程，进程名随系统语言显示
-- **配置即文件**：2.1.0 起全部设置存放在 exe 同目录的 `tdc_config.json`，首次运行自动生成出厂配置，删掉这个文件就回到出厂状态；2.0.0 及更早则写在注册表 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
+- **配置即文件**：2.1.0 起全部设置存放在 exe 同目录的 `tdc_config.json`，首次运行自动生成默认配置，删掉这个文件就回到默认状态；2.0.0 及更早则写在注册表 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
 - **全局快捷键**：默认 `Win+F` 创建文本文档、`Win+J` 打开记事本，包含 `Win` 的组合也能被覆盖
 - **托盘常驻**：启动后只出现在托盘，不弹设置窗口；左键单击托盘打开设置，右键菜单为 设置 / 开机自启动 / 退出
 - **现代化界面**：悬停、按压、下拉展开、开关滑块、主题切换均为动画，且可被打断
@@ -42,7 +42,7 @@ cargo build --release
 
 - 启动后不会弹窗，图标直接出现在托盘，左键单击打开设置界面
 - 首次使用时，若此 exe 所在目录下没有配置文件，首次运行会在 exe 所在目录下自动创建配置文件。（建议创建一个文件夹来存放该exe程序与配置文件，方便管理）
-- 出厂默认只开启「创建文本文档」，「打开记事本」与「开机自启动」默认关闭，需要时在设置界面或托盘菜单里自行打开
+- 默认只开启「创建文本文档」，「打开记事本」与「开机自启动」默认关闭，需要时在设置界面或托盘菜单里自行打开
 
 ### 使用
 
@@ -171,7 +171,7 @@ cargo build --release
 | `src/theme.rs` | 深浅色调色板、颜色混合、系统主题判定与主题过渡插值 |
 | `src/anim.rs` | 指数逼近动画与速度控制 |
 | `src/i18n.rs` | 20 种语言文案、语言代码表与系统语言检测 |
-| `src/config.rs` | `tdc_config.json` 读写、出厂默认值、开机自启动计划任务登记 |
+| `src/config.rs` | `tdc_config.json` 读写、默认状态、开机自启动计划任务登记 |
 | `src/hotkey.rs` | 全局键盘钩子线程、按键捕获与绑定、创建文本文档、启动记事本 |
 | `src/ffi.rs` | Win32 常量与 user32 / kernel32 / shell32 等 API 声明 |
 | `src/sys.rs` | 结构体定义与其余 API 声明（注册表、计划任务、COM、托盘、进程） |
@@ -191,16 +191,16 @@ cargo build --release
 
 ### 2.1.0 及以后
 
-- 设置：exe 同目录的 `tdc_config.json`（首次运行时自动写出厂配置，之后每次修改即时写回；也可以直接编辑该文件，重启程序后生效）
+- 设置：exe 同目录的 `tdc_config.json`（首次运行时自动写默认配置，之后每次修改即时写回；也可以直接编辑该文件，重启程序后生效）
 
 字段说明：
 
 | 字段 | 含义 |
 | --- | --- |
 | `version` | 配置格式版本号，固定为 `1`；只在将来配置结构变化时用于迁移，平时不用改 |
-| `enable_create` | 创建文本文档开关，出厂 `true` |
-| `enable_notepad` | 打开记事本开关，出厂 `false` |
-| `autostart` | 开机自启动开关，出厂 `false` |
+| `enable_create` | 创建文本文档开关，默认 `true` |
+| `enable_notepad` | 打开记事本开关，默认 `false` |
+| `autostart` | 开机自启动开关，默认 `false` |
 | `language` | 界面语言，`auto` 表示跟随系统 |
 | `theme` | `0` 自动、`1` 浅色、`2` 深色 |
 | `hotkey_create` / `hotkey_notepad` | 主功能快捷键，如 `Win+F`、`Win+J` |
@@ -227,4 +227,4 @@ cargo build --release
 
 - 设置：注册表 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，全部是 `REG_DWORD` 值：`EnableCreate`、`EnableNotepad`、`AutoStart`、`VkCreate`、`ModCreate`、`VkNotepad`、`ModNotepad`、`VkSwitchCreate`、`ModSwitchCreate`、`VkSwitchNotepad`、`ModSwitchNotepad`、`Language`、`LanguageAuto`、`ThemeMode`
 - 开机自启动：计划任务 `TextDocumentCreator`；最早的两版没有任务，只写 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator` 值（内容为 exe 完整路径）
-- 这些旧版没有配置文件，升级到 2.1.0 后首次运行会读不到 `tdc_config.json`，按出厂值重建，旧注册表项不再被使用
+- 这些旧版没有配置文件，升级到 2.1.0 后首次运行会读不到 `tdc_config.json`，按默认值重建，旧注册表项不再被使用

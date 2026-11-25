@@ -10,7 +10,7 @@
 
 - **單一 exe**：靜態連結 CRT，只依賴 `user32` / `gdi32` / `dwmapi` / `shell32` / `advapi32` / `uxtheme` / `ole32`，複製到任意 Windows 10/11 電腦即可執行
 - **單一處理序**：沒有子處理序、沒有額外的裝載處理序；工作管理員「處理程序」與「詳細資料」中都只有一個項目，名稱隨系統語言顯示
-- **設定即檔案**：2.1.0 起所有設定存放在 exe 同目錄的 `tdc_config.json`，首次執行自動產生出廠設定，刪除這個檔案就回到出廠狀態；2.0.0 及更早則寫在登錄檔 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
+- **設定即檔案**：2.1.0 起所有設定存放在 exe 同目錄的 `tdc_config.json`，首次執行自動產生預設設定，刪除這個檔案就回到預設狀態；2.0.0 及更早則寫在登錄檔 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
 - **全域快速鍵**：預設 `Win+F` 建立文字文件、`Win+J` 開啟記事本，含 `Win` 的組合也能被覆蓋
 - **匣盤常駐**：啟動後只出現在匣盤，不彈出設定視窗；左鍵單擊開設定，右鍵選單為 設定 / 開機自動啟動 / 結束
 - **現代化介面**：滑鼠移入、按下、下拉展開、開關滑塊、主題切換皆有動畫，且可被中斷
@@ -171,7 +171,7 @@ cargo build --release
 | `src/theme.rs` | 深淺色調色盤、顏色混合、系統主題判定與主題轉場插值 |
 | `src/anim.rs` | 指數逼近動畫與速度控制 |
 | `src/i18n.rs` | 20 種語言文案、語言代碼表與系統語言偵測 |
-| `src/config.rs` | `tdc_config.json` 讀寫、出廠預設值、開機自動啟動排程工作登記 |
+| `src/config.rs` | `tdc_config.json` 讀寫、預設狀態、開機自動啟動排程工作登記 |
 | `src/hotkey.rs` | 全域鍵盤鉤子執行緒、按鍵擷取與綁定、建立文字文件、啟動記事本 |
 | `src/ffi.rs` | Win32 常數與 user32 / kernel32 / shell32 等 API 宣告 |
 | `src/sys.rs` | 結構定義與其餘 API 宣告（登錄檔、排程工作、COM、匣盤、處理程序） |
@@ -191,16 +191,16 @@ cargo build --release
 
 ### 2.1.0 及之後
 
-- 設定：exe 同目錄的 `tdc_config.json`（首次執行時寫出出廠設定，之後每次修改即時寫回；也可以直接編輯這個檔案，重新啟動程式後生效）
+- 設定：exe 同目錄的 `tdc_config.json`（首次執行時寫出預設設定，之後每次修改即時寫回；也可以直接編輯這個檔案，重新啟動程式後生效）
 
 欄位說明：
 
 | 欄位 | 含義 |
 | --- | --- |
 | `version` | 設定格式版本號，固定為 `1`；只在將來設定結構變化時用於遷移，平時不用改 |
-| `enable_create` | 建立文字檔案開關，出廠 `true` |
-| `enable_notepad` | 開啟記事本開關，出廠 `false` |
-| `autostart` | 開機自動啟動開關，出廠 `false` |
+| `enable_create` | 建立文字檔案開關，預設 `true` |
+| `enable_notepad` | 開啟記事本開關，預設 `false` |
+| `autostart` | 開機自動啟動開關，預設 `false` |
 | `language` | 介面語言，`auto` 表示跟隨系統 |
 | `theme` | `0` 自動、`1` 淺色、`2` 深色 |
 | `hotkey_create` / `hotkey_notepad` | 主功能快速鍵，如 `Win+F`、`Win+J` |
@@ -227,4 +227,4 @@ cargo build --release
 
 - 設定：登錄檔 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，全部是 `REG_DWORD`：`EnableCreate`、`EnableNotepad`、`AutoStart`、`VkCreate`、`ModCreate`、`VkNotepad`、`ModNotepad`、`VkSwitchCreate`、`ModSwitchCreate`、`VkSwitchNotepad`、`ModSwitchNotepad`、`Language`、`LanguageAuto`、`ThemeMode`
 - 開機自動啟動：排程工作 `TextDocumentCreator`；最早的兩版沒有排程工作，只寫 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 下的 `Text_Document_Creator` 值（內容為 exe 完整路徑）
-- 這些舊版沒有設定檔，升級到 2.1.0 後首次執行會重新寫出出廠設定，舊登錄檔項不再被讀取
+- 這些舊版沒有設定檔，升級到 2.1.0 後首次執行會重新寫出預設設定，舊登錄檔項不再被讀取

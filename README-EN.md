@@ -10,7 +10,7 @@ The settings window is not assembled from stock controls but drawn from scratch:
 
 - **Single exe**: statically linked CRT, only depends on `user32` / `gdi32` / `dwmapi` / `shell32` / `advapi32` / `uxtheme` / `ole32`, so it runs from any Windows 10/11 machine as-is
 - **Single process**: no child processes and no host process; one entry in both the Processes and Details tabs of Task Manager, with a display name that follows the system language
-- **Settings are just a file**: from 2.1.0 on everything lives in `tdc_config.json` next to the exe, written on first run and updated on every change, so deleting that one file restores the factory state; 2.0.0 and earlier kept the same settings in the registry under `HKEY_CURRENT_USER\Software\TextDocumentCreator`
+- **Settings are just a file**: from 2.1.0 on everything lives in `tdc_config.json` next to the exe, written on first run and updated on every change, so deleting that one file restores the default state; 2.0.0 and earlier kept the same settings in the registry under `HKEY_CURRENT_USER\Software\TextDocumentCreator`
 - **Global hotkeys**: `Win+F` creates a text document and `Win+J` opens Notepad by default; combinations that include `Win` are overridden as well
 - **Tray resident**: starts silently in the tray without showing a window; left click opens the settings, right click shows Settings / Run at startup / Exit
 - **Modern UI**: hover, press, dropdown, toggle and theme transitions are all animated and interruptible
@@ -171,7 +171,7 @@ Output: `target\release\text_document_creator.exe`
 | `src/theme.rs` | Light and dark palettes, colour mixing, system theme detection and transition interpolation |
 | `src/anim.rs` | Exponential approach animation and speed control |
 | `src/i18n.rs` | Strings for 20 languages, locale codes and system language detection |
-| `src/config.rs` | Reads and writes `tdc_config.json`, factory defaults, autostart scheduled task |
+| `src/config.rs` | Reads and writes `tdc_config.json`, the default state, autostart scheduled task |
 | `src/hotkey.rs` | Global keyboard hook thread, key capture and binding, text file creation, Notepad launch |
 | `src/ffi.rs` | Win32 constants and user32 / kernel32 / shell32 declarations |
 | `src/sys.rs` | Structures and the remaining declarations (registry, scheduled task, COM, tray, processes) |
@@ -192,16 +192,16 @@ Output: `target\release\text_document_creator.exe`
 
 ### 2.1.0 and later
 
-- Settings: `tdc_config.json` next to the exe (factory values are written on first run, every change is saved immediately, and you can edit the file by hand and restart the app)
+- Settings: `tdc_config.json` next to the exe (the default values are written on first run, every change is saved immediately, and you can edit the file by hand and restart the app)
 
 Fields:
 
 | Field | Meaning |
 | --- | --- |
 | `version` | Config format version, always `1`; only used for migration if the structure ever changes, leave it alone |
-| `enable_create` | Create text file switch, factory `true` |
-| `enable_notepad` | Open Notepad switch, factory `false` |
-| `autostart` | Run at startup switch, factory `false` |
+| `enable_create` | Create text file switch, default `true` |
+| `enable_notepad` | Open Notepad switch, default `false` |
+| `autostart` | Run at startup switch, default `false` |
 | `language` | UI language, `auto` follows the system |
 | `theme` | `0` auto, `1` light, `2` dark |
 | `hotkey_create` / `hotkey_notepad` | Main shortcuts such as `Win+F` and `Win+J` |
@@ -228,4 +228,4 @@ Available `language` codes:
 
 - Settings: registry `HKEY_CURRENT_USER\Software\TextDocumentCreator`, all `REG_DWORD`: `EnableCreate`, `EnableNotepad`, `AutoStart`, `VkCreate`, `ModCreate`, `VkNotepad`, `ModNotepad`, `VkSwitchCreate`, `ModSwitchCreate`, `VkSwitchNotepad`, `ModSwitchNotepad`, `Language`, `LanguageAuto`, `ThemeMode`
 - Run at startup: the `TextDocumentCreator` scheduled task; the two earliest releases had no task and written the `Text_Document_Creator` value under `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` (the exe path)
-- Those versions have no config file, so the first run of 2.1.0 writes factory defaults and the old registry keys are no longer read
+- Those versions have no config file, so the first run of 2.1.0 writes the default values and the old registry keys are no longer read
