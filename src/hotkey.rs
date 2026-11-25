@@ -478,8 +478,8 @@ unsafe extern "system" fn hook_proc(code: i32, wp: WPARAM, lp: LPARAM) -> LRESUL
 }
 pub fn document_name(lang: usize) -> &'static str {
     match lang {
-        1 => "新增文字文件",
-        2 => "New Text Document",
+        2 => "新增文字文件",
+        3 | 4 => "New Text Document",
         _ => "新建文本文档",
     }
 }

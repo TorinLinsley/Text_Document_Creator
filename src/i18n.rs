@@ -38,7 +38,66 @@ pub struct Lang {
 
 pub const NAMES: [&str; 20] = ["简体中文", "繁體中文", "English (US)", "English (UK)", "日本語", "한국어", "Français", "Deutsch", "Español", "Italiano", "Русский", "Português (BR)", "Polski", "Nederlands", "Türkçe", "Українська", "Tiếng Việt", "Bahasa Indonesia", "ไทย", "हिन्दी"];
 
-pub const COUNT: usize = NAMES.len();
+pub const COUNT: usize = NAMES.len() + 1;
+
+pub fn item_name(index: usize, ui: usize) -> &'static str {
+    if index == 0 {
+        return match ui {
+            2 => "跟隨系統",
+            3 | 4 => "Follow system",
+            5 => "システムに従う",
+            6 => "시스템 설정 따르기",
+            7 => "Suivre le système",
+            8 => "Systemeinstellung folgen",
+            9 => "Seguir el sistema",
+            10 => "Segui il sistema",
+            11 => "Как в системе",
+            12 => "Seguir o sistema",
+            13 => "Zgodnie z systemem",
+            14 => "Systeem volgen",
+            15 => "Sistemi izle",
+            16 => "Як у системі",
+            17 => "Theo hệ thống",
+            18 => "Ikuti sistem",
+            19 => "ตามระบบ",
+            20 => "सिस्टम के अनुसार",
+            _ => "跟随系统",
+        };
+    }
+    NAMES.get(index - 1).copied().unwrap_or("English (US)")
+}
+
+pub const CODES: [&str; 20] = [
+    "zh_cn", "zh_hk", "en_us", "en_uk", "ja_jp", "ko_kr", "fr_fr", "de_de", "es_es", "it_it",
+    "ru_ru", "pt_br", "pl_pl", "nl_nl", "tr_tr", "uk_ua", "vi_vn", "id_id", "th_th", "hi_in",
+];
+
+pub fn code(index: usize) -> &'static str {
+    if index == 0 {
+        return "auto";
+    }
+    CODES.get(index - 1).copied().unwrap_or("auto")
+}
+
+pub fn parse_code(text: &str) -> Option<usize> {
+    if text.eq_ignore_ascii_case("auto") {
+        return Some(0);
+    }
+    for (i, code) in CODES.iter().enumerate() {
+        if text.eq_ignore_ascii_case(code) {
+            return Some(i + 1);
+        }
+    }
+    None
+}
+
+pub fn resolve(index: usize) -> usize {
+    if index == 0 {
+        detect()
+    } else {
+        index.min(COUNT - 1)
+    }
+}
 
 const ZH_CN: Lang = Lang {
     title: "设置",
@@ -707,30 +766,34 @@ const HI: Lang = Lang {
 
 pub fn lang(index: usize) -> &'static Lang {
     match index {
-        0 => &ZH_CN,
-        1 => &ZH_TW,
-        3 => &EN,
-        4 => &JA,
-        5 => &KO,
-        6 => &FR,
-        7 => &DE,
-        8 => &ES,
-        9 => &IT,
-        10 => &RU,
-        11 => &PT,
-        12 => &PL,
-        13 => &NL,
-        14 => &TR,
-        15 => &UK,
-        16 => &VI,
-        17 => &ID,
-        18 => &TH,
-        19 => &HI,
+        0 | 1 => &ZH_CN,
+        2 => &ZH_TW,
+        3 | 4 => &EN,
+        5 => &JA,
+        6 => &KO,
+        7 => &FR,
+        8 => &DE,
+        9 => &ES,
+        10 => &IT,
+        11 => &RU,
+        12 => &PT,
+        13 => &PL,
+        14 => &NL,
+        15 => &TR,
+        16 => &UK,
+        17 => &VI,
+        18 => &ID,
+        19 => &TH,
+        20 => &HI,
         _ => &EN,
     }
 }
 
 pub fn detect() -> usize {
+    detect_base() + 1
+}
+
+fn detect_base() -> usize {
     unsafe {
         let mut buf = [0u16; 85];
         let len = GetUserDefaultLocaleName(buf.as_mut_ptr(), 85);

@@ -114,7 +114,7 @@ The program is one Win32 window, one tray icon and one global hook. It spawns no
 ## Languages
 
 - 20 languages: Simplified Chinese, Traditional Chinese, English (US), English (UK), Japanese, Korean, French, German, Spanish, Italian, Russian, Portuguese (BR), Polish, Dutch, Turkish, Ukrainian, Vietnamese, Indonesian, Thai and Hindi
-- On startup `GetUserDefaultLocaleName` decides the locale (`zh-CN` and similar map to Simplified Chinese, `zh-TW`/`zh-HK`/`zh-MO` to Traditional), with `GetUserDefaultUILanguage` as the fallback; picking a language manually writes `LanguageAuto=0` so the system language no longer overrides it
+- On startup `GetUserDefaultLocaleName` decides the locale (`zh-CN` and similar map to Simplified Chinese, `zh-TW`/`zh-HK`/`zh-MO` to Traditional), with `GetUserDefaultUILanguage` as the fallback; `language: auto` follows the system, while a manual pick stores its code (for example `zh_hk`) and is no longer overridden
 - The version resource embeds `FileDescription` in 8 languages, so the process name in Task Manager follows the system language
 
 ## Performance and memory
@@ -157,7 +157,36 @@ Output: `target\release\text_document_creator.exe`
 
 ## Data locations
 
-- Settings: `tdc_config.json` next to the exe (written with factory values on first run, rewritten on every change; you can also edit it by hand and restart the app)
+- Settings: `tdc_config.json` next to the exe (factory values are written on first run, every change is saved immediately, and you can edit the file by hand and restart the app)
+
+Fields:
+
+| Field | Meaning |
+| --- | --- |
+| `version` | Config format version, always `1`; only used for migration if the structure ever changes, leave it alone |
+| `enable_create` | Create text file switch, factory `true` |
+| `enable_notepad` | Open Notepad switch, factory `false` |
+| `autostart` | Run at startup switch, factory `false` |
+| `language` | UI language, `auto` follows the system |
+| `theme` | `0` auto, `1` light, `2` dark |
+| `hotkey_create` / `hotkey_notepad` | Main shortcuts such as `Win+F` and `Win+J` |
+| `hotkey_toggle_create` / `hotkey_toggle_notepad` | The two toggle shortcuts, empty means not set |
+
+Available `language` codes:
+
+| Code | Language | Code | Language |
+| --- | --- | --- | --- |
+| `auto` | Follow system | `ru_ru` | Русский |
+| `zh_cn` | 简体中文 | `pt_br` | Português (BR) |
+| `zh_hk` | 繁體中文 | `pl_pl` | Polski |
+| `en_us` | English (US) | `nl_nl` | Nederlands |
+| `en_uk` | English (UK) | `tr_tr` | Türkçe |
+| `ja_jp` | 日本語 | `uk_ua` | Українська |
+| `ko_kr` | 한국어 | `vi_vn` | Tiếng Việt |
+| `fr_fr` | Français | `id_id` | Bahasa Indonesia |
+| `de_de` | Deutsch | `th_th` | ไทย |
+| `es_es` | Español | `hi_in` | हिन्दी |
+| `it_it` | Italiano | | |
 - Legacy note: versions 2.0.0 and earlier kept the same settings in `HKEY_CURRENT_USER\Software\TextDocumentCreator`
 - Run at startup: the `\TextDocumentCreator` scheduled task (`ONLOGON` with highest privileges, so logon is silent and shows no UAC prompt; turning the switch off deletes it)
 

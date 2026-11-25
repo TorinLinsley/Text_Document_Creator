@@ -114,7 +114,7 @@ cargo build --release
 ## 語言
 
 - 20 種語言：簡體中文、繁體中文、English (US)、English (UK)、日本語、한국어、Français、Deutsch、Español、Italiano、Русский、Português (BR)、Polski、Nederlands、Türkçe、Українська、Tiếng Việt、Bahasa Indonesia、ไทย、हिन्दी
-- 啟動時用 `GetUserDefaultLocaleName` 判斷系統區域（`zh-CN` 等 → 簡體中文，`zh-TW`/`zh-HK`/`zh-MO` → 繁體），再回退到 `GetUserDefaultUILanguage`；手動選擇過語言後寫入 `LanguageAuto=0`，之後不再被系統語言覆蓋
+- 啟動時用 `GetUserDefaultLocaleName` 判斷系統區域（`zh-CN` 等 → 簡體中文，`zh-TW`/`zh-HK`/`zh-MO` → 繁體），再回退到 `GetUserDefaultUILanguage`；設定裡的 `language` 為 `auto` 時跟隨系統，手動選過語言後寫入對應代碼（例如 `zh_hk`），不再被系統語言覆蓋
 - 版本資源內嵌 8 種語言的 `FileDescription`，工作管理員「處理程序」頁的程式名稱隨系統語言變化
 
 ## 效能與記憶體
@@ -158,6 +158,35 @@ cargo build --release
 ## 資料位置
 
 - 設定：exe 同目錄的 `tdc_config.json`（首次執行時寫出出廠設定，之後每次修改即時寫回；也可以直接編輯這個檔案，重新啟動程式後生效）
+
+欄位說明：
+
+| 欄位 | 含義 |
+| --- | --- |
+| `version` | 設定格式版本號，固定為 `1`；只在將來設定結構變化時用於遷移，平時不用改 |
+| `enable_create` | 建立文字檔案開關，出廠 `true` |
+| `enable_notepad` | 開啟記事本開關，出廠 `false` |
+| `autostart` | 開機自動啟動開關，出廠 `false` |
+| `language` | 介面語言，`auto` 表示跟隨系統 |
+| `theme` | `0` 自動、`1` 淺色、`2` 深色 |
+| `hotkey_create` / `hotkey_notepad` | 主功能快速鍵，如 `Win+F`、`Win+J` |
+| `hotkey_toggle_create` / `hotkey_toggle_notepad` | 兩個開關快速鍵，留空表示未設定 |
+
+`language` 可用的語言代碼：
+
+| 代碼 | 語言 | 代碼 | 語言 |
+| --- | --- | --- | --- |
+| `auto` | 跟隨系統 | `ru_ru` | Русский |
+| `zh_cn` | 简体中文 | `pt_br` | Português (BR) |
+| `zh_hk` | 繁體中文 | `pl_pl` | Polski |
+| `en_us` | English (US) | `nl_nl` | Nederlands |
+| `en_uk` | English (UK) | `tr_tr` | Türkçe |
+| `ja_jp` | 日本語 | `uk_ua` | Українська |
+| `ko_kr` | 한국어 | `vi_vn` | Tiếng Việt |
+| `fr_fr` | Français | `id_id` | Bahasa Indonesia |
+| `de_de` | Deutsch | `th_th` | ไทย |
+| `es_es` | Español | `hi_in` | हिन्दी |
+| `it_it` | Italiano | | |
 - 舊版說明：2.0.0 及更早的版本把同樣的設定放在登錄檔 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
 - 開機自動啟動：排程工作 `\TextDocumentCreator`（`ONLOGON` + 最高權限，登入時靜默啟動、不彈 UAC；關閉開關會刪除該工作）
 

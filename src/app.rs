@@ -112,13 +112,10 @@ pub struct App {
 impl App {
     pub unsafe fn new(hwnd: HWND, inst: HINSTANCE) -> App {
         let settings = Settings::load();
-        if settings.language_auto {
-            settings.save();
-        }
         let mut app = App {
             hwnd,
             inst,
-            lang: settings.language,
+            lang: i18n::resolve(settings.language),
             settings,
             dpi: 96,
             w: 0,
@@ -844,12 +841,11 @@ impl App {
     }
 
     pub unsafe fn set_language(&mut self, index: usize) {
-        if index == self.lang || index >= i18n::COUNT {
+        if index >= i18n::COUNT || index == self.settings.language {
             return;
         }
-        self.lang = index;
         self.settings.language = index;
-        self.settings.language_auto = false;
+        self.lang = i18n::resolve(index);
         self.settings.save();
         hotkey::update(self.settings);
         let title = w(self.t().title);
@@ -857,7 +853,7 @@ impl App {
     }
 
     pub unsafe fn step_language(&mut self, dir: i32) -> bool {
-        let next = self.lang as i32 + dir;
+        let next = self.settings.language as i32 + dir;
         if next < 0 || next as usize >= i18n::COUNT {
             return false;
         }
@@ -1200,7 +1196,7 @@ impl App {
             g.stroke(l.lang.x, l.lang.y, l.lang.w, l.lang.h, 10.0, theme.accent, 1.6);
         }
         let lang_hover = self.anims[ID_LANG as usize].value;
-        g.text(i18n::NAMES[self.lang], l.lang.x + 16.0, l.lang.y, l.lang.w - 46.0, l.lang.h, 13, false, theme.text, Align::Near);
+        g.text(i18n::item_name(self.settings.language, self.lang), l.lang.x + 16.0, l.lang.y, l.lang.w - 46.0, l.lang.h, 13, false, theme.text, Align::Near);
         let cx = l.lang.x + l.lang.w - 18.0;
         let cy = l.lang.cy();
         let chevron = mix(theme.dim, theme.text, lang_hover);
@@ -1479,16 +1475,17 @@ impl App {
                 continue;
             }
             let hv = self.anims[(ID_LANG_ITEM + i as u32) as usize].value;
-            let selected = i == self.lang;
+            let selected = i == self.settings.language;
             if hv > 0.01 {
                 g.round(x + 6.0, iy + 2.0, wd - 12.0, 36.0, 8.0, with_alpha(theme.accent, 0.10 * hv));
             }
             let ink = if selected { theme.accent } else { theme.text };
             let mut size = 13u8;
-            while size > 10 && g.text_width(i18n::NAMES[i], size, selected) > wd - 28.0 {
+            let label = i18n::item_name(i, self.lang);
+            while size > 10 && g.text_width(label, size, selected) > wd - 28.0 {
                 size -= 1;
             }
-            g.text(i18n::NAMES[i], x + 14.0, iy, wd - 28.0, 40.0, size, selected, ink, Align::Near);
+            g.text(label, x + 14.0, iy, wd - 28.0, 40.0, size, selected, ink, Align::Near);
         }
         g.unclip();
         if let Some((thumb_y, thumb_h, _)) = self.scroll_geom(&l) {

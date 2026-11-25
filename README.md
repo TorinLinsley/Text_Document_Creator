@@ -114,7 +114,7 @@ cargo build --release
 ## 语言
 
 - 20 种语言：简体中文、繁體中文、English (US)、English (UK)、日本語、한국어、Français、Deutsch、Español、Italiano、Русский、Português (BR)、Polski、Nederlands、Türkçe、Українська、Tiếng Việt、Bahasa Indonesia、ไทย、हिन्दी
-- 启动时用 `GetUserDefaultLocaleName` 判断系统区域（`zh-CN` 等 → 简体中文，`zh-TW`/`zh-HK`/`zh-MO` → 繁體），再回退到 `GetUserDefaultUILanguage`；手动选择过语言后写入 `LanguageAuto=0`，之后不再被系统语言覆盖
+- 启动时用 `GetUserDefaultLocaleName` 判断系统区域（`zh-CN` 等 → 简体中文，`zh-TW`/`zh-HK`/`zh-MO` → 繁體），再回退到 `GetUserDefaultUILanguage`；配置里的 `language` 为 `auto` 时跟随系统，手动选过语言后写入对应代码（如 `zh_hk`），不再被系统语言覆盖
 - 版本资源内嵌 8 种语言的 `FileDescription`，任务管理器「进程」页的进程名随系统语言变化
 
 ## 性能与内存
@@ -158,6 +158,35 @@ cargo build --release
 ## 数据位置
 
 - 设置：exe 同目录的 `tdc_config.json`（首次运行时自动写出厂配置，之后每次修改即时写回；也可以直接编辑该文件，重启程序后生效）
+
+字段说明：
+
+| 字段 | 含义 |
+| --- | --- |
+| `version` | 配置格式版本号，固定为 `1`；只在将来配置结构变化时用于迁移，平时不用改 |
+| `enable_create` | 创建文本文档开关，出厂 `true` |
+| `enable_notepad` | 打开记事本开关，出厂 `false` |
+| `autostart` | 开机自启动开关，出厂 `false` |
+| `language` | 界面语言，`auto` 表示跟随系统 |
+| `theme` | `0` 自动、`1` 浅色、`2` 深色 |
+| `hotkey_create` / `hotkey_notepad` | 主功能快捷键，如 `Win+F`、`Win+J` |
+| `hotkey_toggle_create` / `hotkey_toggle_notepad` | 两个开关快捷键，留空表示未设置 |
+
+`language` 可用的语言代码：
+
+| 代码 | 语言 | 代码 | 语言 |
+| --- | --- | --- | --- |
+| `auto` | 跟随系统 | `ru_ru` | Русский |
+| `zh_cn` | 简体中文 | `pt_br` | Português (BR) |
+| `zh_hk` | 繁體中文 | `pl_pl` | Polski |
+| `en_us` | English (US) | `nl_nl` | Nederlands |
+| `en_uk` | English (UK) | `tr_tr` | Türkçe |
+| `ja_jp` | 日本語 | `uk_ua` | Українська |
+| `ko_kr` | 한국어 | `vi_vn` | Tiếng Việt |
+| `fr_fr` | Français | `id_id` | Bahasa Indonesia |
+| `de_de` | Deutsch | `th_th` | ไทย |
+| `es_es` | Español | `hi_in` | हिन्दी |
+| `it_it` | Italiano | | |
 - 开机自启动：计划任务 `\TextDocumentCreator`（`ONLOGON` + 最高权限，登录时静默启动、不弹 UAC；关闭开关会删除该任务）
 
 ## 卸载

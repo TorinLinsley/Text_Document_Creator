@@ -35,7 +35,6 @@ pub struct Settings {
     pub vk_switch_notepad: u32,
     pub mod_switch_notepad: u32,
     pub language: usize,
-    pub language_auto: bool,
     pub theme_mode: u32,
 }
 
@@ -53,8 +52,7 @@ impl Settings {
             mod_switch_create: 0,
             vk_switch_notepad: 0,
             mod_switch_notepad: 0,
-            language: crate::i18n::detect(),
-            language_auto: true,
+            language: 0,
             theme_mode: 0,
         }
     }
@@ -78,12 +76,16 @@ impl Settings {
         if let Some(value) = field(&text, "autostart") {
             s.autostart = value == "true";
         }
-        if let Some(value) = field(&text, "language_auto") {
-            s.language_auto = value == "true";
-        }
-        if let Some(value) = number(&text, "language") {
-            if (value as usize) < crate::i18n::COUNT {
-                s.language = value as usize;
+        let legacy = field(&text, "language_auto");
+        if let Some(value) = field(&text, "language") {
+            if let Some(index) = crate::i18n::parse_code(&value) {
+                s.language = index;
+            } else if let Ok(raw) = value.parse::<usize>() {
+                s.language = match legacy.as_deref() {
+                    Some("true") => 0,
+                    Some(_) => (raw + 1).min(crate::i18n::COUNT - 1),
+                    None => raw.min(crate::i18n::COUNT - 1),
+                };
             }
         }
         if let Some(value) = number(&text, "theme") {
@@ -115,20 +117,16 @@ impl Settings {
             s.vk_switch_notepad = vk;
             s.mod_switch_notepad = mods;
         }
-        if s.language_auto {
-            s.language = crate::i18n::detect();
-        }
         s
     }
 
     pub fn save(&self) {
         let text = format!(
-            "{{\n  \"version\": 1,\n  \"enable_create\": {},\n  \"enable_notepad\": {},\n  \"autostart\": {},\n  \"language_auto\": {},\n  \"language\": {},\n  \"theme\": {},\n  \"hotkey_create\": \"{}\",\n  \"hotkey_notepad\": \"{}\",\n  \"hotkey_toggle_create\": \"{}\",\n  \"hotkey_toggle_notepad\": \"{}\"\n}}\n",
+            "{{\n  \"version\": 1,\n  \"enable_create\": {},\n  \"enable_notepad\": {},\n  \"autostart\": {},\n  \"language\": \"{}\",\n  \"theme\": {},\n  \"hotkey_create\": \"{}\",\n  \"hotkey_notepad\": \"{}\",\n  \"hotkey_toggle_create\": \"{}\",\n  \"hotkey_toggle_notepad\": \"{}\"\n}}\n",
             self.enable_create,
             self.enable_notepad,
             self.autostart,
-            self.language_auto,
-            self.language,
+            crate::i18n::code(self.language),
             self.theme_mode,
             crate::hotkey::shortcut_text(self.vk_create, self.mod_create),
             crate::hotkey::shortcut_text(self.vk_notepad, self.mod_notepad),
