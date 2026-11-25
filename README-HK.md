@@ -72,7 +72,7 @@ cargo build --release
 ## 快速鍵
 
 - 修飾鍵：`Ctrl`、`Shift`、`Alt`、`Win`，左右兩側皆可，任意組合
-- 主鍵：字母 A–Z、數字 0–9、`F1`–`F24`、小鍵盤 `Num0`–`Num9` 與 `Num*` `Num+` `Num-` `Num.` `Num/`、方向鍵、`Home`/`End`/`PageUp`/`PageDown`/`Insert`/`Delete`、`Space`/`Tab`/`Enter`/`Backspace`/`Esc`、符號鍵與多媒體鍵
+- 主鍵：字母 A–Z、數字 0–9、`F1`–`F12`、小鍵盤 `Num0`–`Num9` 與 `Num*` `Num+` `Num-` `Num.` `Num/`、方向鍵、`Home`/`End`/`PageUp`/`PageDown`/`Insert`/`Delete`、`Space`/`Tab`/`Enter`/`Backspace`/`Esc`、符號鍵與多媒體鍵
 - 在輸入框中直接按下目標組合即可綁定，`Esc` 取消；「清除」清空該行，「重設」還原該行預設，「全部重設」還原所有預設
 - 全域鉤子執行於獨立的 TIME_CRITICAL 執行緒，優先順序高於系統與其他程式；命中組合鍵時會吞掉按鍵，且不會殘留 `Win` 狀態（不會誤彈開始功能表或系統搜尋）
 - 綁定時按住 `Win` 再按其他鍵，不會再彈出開始功能表

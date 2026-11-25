@@ -72,7 +72,7 @@ cargo build --release
 ## 快捷键
 
 - 修饰键：`Ctrl`、`Shift`、`Alt`、`Win`，左右两侧均可，任意组合
-- 主键：字母 A–Z、数字 0–9、`F1`–`F24`、小键盘 `Num0`–`Num9` 与 `Num*` `Num+` `Num-` `Num.` `Num/`、方向键、`Home`/`End`/`PageUp`/`PageDown`/`Insert`/`Delete`、`Space`/`Tab`/`Enter`/`Backspace`/`Esc`、符号键与多媒体键
+- 主键：字母 A–Z、数字 0–9、`F1`–`F12`、小键盘 `Num0`–`Num9` 与 `Num*` `Num+` `Num-` `Num.` `Num/`、方向键、`Home`/`End`/`PageUp`/`PageDown`/`Insert`/`Delete`、`Space`/`Tab`/`Enter`/`Backspace`/`Esc`、符号键与多媒体键
 - 在输入框中直接按下目标组合即可绑定，`Esc` 取消；「清除」清空当行，「重置」恢复该行默认，「重置全部」恢复所有默认
 - 全局钩子运行在独立的 TIME_CRITICAL 线程上，优先级高于系统与其他程序；命中组合键时吞掉按键，且不会残留 `Win` 状态（不会误弹开始菜单或系统搜索）
 - 绑定时按住 `Win` 再按其他键，不会再弹出开始菜单
