@@ -18,12 +18,7 @@ The settings window is not assembled from stock controls but drawn from scratch:
 - **High DPI aware**: Per-Monitor V2, crisp text at 125% / 150%, live reflow when scaling or resolution changes
 - **Lightweight**: about 508 KB exe; sitting in the tray with no settings window open and nothing happening costs about **280 KB** of private working set, and about 1.5 MB private memory once the settings window is open
 
-## Usage
-
-1. Double click to run; the app stays in the tray and shows no window on startup
-2. Press `Win+F`: creates `新建文本文档.txt` in the **currently focused Explorer folder**, or `新建文本文档_1.txt`, `_2`... when it already exists; when the desktop is focused the file is created there
-3. Press `Win+J`: opens Notepad in a new window every time, so several can be opened at once; about 0.15 s from key press to window
-4. Left click the tray icon to open the settings: toggle features, bind shortcuts, switch language and theme, or read About
+## Download, usage and uninstall
 
 ### Download and install
 
@@ -47,7 +42,13 @@ This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `
 
 - No window appears on startup: the icon simply shows up in the tray, and a left click opens the settings
 - Out of the box only "Create text file" is enabled; "Open Notepad" and "Run at startup" are off until you turn them on in the settings or the tray menu
-- To uninstall: see [Uninstall](#uninstall)
+
+### Usage
+
+1. Double click to run; the app stays in the tray and shows no window on startup
+2. Press `Win+F`: creates `新建文本文档.txt` in the **currently focused Explorer folder**, or `新建文本文档_1.txt`, `_2`... when it already exists; when the desktop is focused the file is created there
+3. Press `Win+J`: opens Notepad in a new window every time, so several can be opened at once; about 0.15 s from key press to window
+4. Left click the tray icon to open the settings: toggle features, bind shortcuts, switch language and theme, or read About
 
 ### Uninstall
 
