@@ -16,9 +16,9 @@ pub const ID_KEY: u32 = 20;
 pub const ID_CLEAR: u32 = 30;
 pub const ID_RESET: u32 = 40;
 pub const ID_RESET_ALL: u32 = 50;
-pub const ID_LANG_ITEM: u32 = 60;
-pub const ID_THEME_ITEM: u32 = 80;
-const IDS: usize = 96;
+pub const ID_LANG_ITEM: u32 = 200;
+pub const ID_THEME_ITEM: u32 = 240;
+const IDS: usize = 320;
 
 #[derive(Clone, Copy, Default)]
 pub struct RectF {
