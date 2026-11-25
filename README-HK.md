@@ -23,7 +23,7 @@
 
 1. 開啟 [Releases](https://github.com/TorinLinsley/Text_Document_Creator/releases) 下載最新的 `text_document_creator_版本号.exe`
 2. 放到任意目錄（例如 `D:\Tools\TextDocumentCreator`），雙擊即可執行
-3. 無需安裝，也不需要 .NET 或 VC++ 執行階段；刪除 exe 即完成解除安裝
+3. 無需安裝，也不需要 .NET 或 VC++ 執行階段；刪除 exe 即不再執行（設定與開機自動啟動登錄仍會保留，需要一併清除見下文「徹底解除安裝」）
 
 ### 自行編譯
 
@@ -39,7 +39,7 @@ cargo build --release
 
 - 啟動後不會彈窗，圖示直接出現在匣盤，左鍵單擊開啟設定介面
 - 需要開機自動啟動時，在設定介面或匣盤選單中開啟「開機自動啟動」
-- 徹底解除安裝：匣盤選單「結束」，刪除 exe；如需清除設定，刪除登錄檔項目 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，並刪除排程工作 `TextDocumentCreator`（`schtasks /Delete /TN TextDocumentCreator /F`）
+- 徹底解除安裝（連同設定與開機自動啟動）：匣盤選單「結束」→ 刪除 exe → 刪除登錄檔項目 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，並刪除排程工作 `TextDocumentCreator`（`schtasks /Delete /TN TextDocumentCreator /F`）
 
 ## 使用
 

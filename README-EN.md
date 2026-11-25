@@ -23,7 +23,7 @@ The settings window is not assembled from stock controls but drawn from scratch:
 
 1. Open [Releases](https://github.com/TorinLinsley/Text_Document_Creator/releases) and download the latest `text_document_creator_版本号.exe`
 2. Put it in any folder (for example `D:\Tools\TextDocumentCreator`) and double click it
-3. Nothing to install, no .NET or VC++ runtime required; deleting the exe uninstalls the app
+3. Nothing to install, no .NET or VC++ runtime required; deleting the exe stops the app (settings and the startup task stay behind, see Uninstall below to remove them too)
 
 ### Build from source
 
@@ -39,7 +39,7 @@ This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `
 
 - No window appears on startup: the icon simply shows up in the tray, and a left click opens the settings
 - Out of the box only "Create text file" is enabled; "Open Notepad" and "Run at startup" are off until you turn them on in the settings or the tray menu
-- To uninstall completely, choose Exit in the tray menu and delete the exe; to remove the settings as well, delete the registry key `HKEY_CURRENT_USER\Software\TextDocumentCreator` and remove the `TextDocumentCreator` scheduled task (`schtasks /Delete /TN TextDocumentCreator /F`)
+- To uninstall completely (settings and startup included): choose Exit in the tray menu, delete the exe, then delete the registry key `HKEY_CURRENT_USER\Software\TextDocumentCreator` and remove the `TextDocumentCreator` scheduled task (`schtasks /Delete /TN TextDocumentCreator /F`)
 
 ## Usage
 

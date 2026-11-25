@@ -23,7 +23,7 @@
 
 1. 打开 [Releases](https://github.com/TorinLinsley/Text_Document_Creator/releases) 下载最新的 `text_document_creator_版本号.exe`
 2. 放到任意目录（例如 `D:\Tools\TextDocumentCreator`），双击即可运行
-3. 无需安装，也不需要 .NET 或 VC++ 运行库；删除 exe 即完成卸载
+3. 无需安装，也不需要 .NET 或 VC++ 运行库；删除 exe 即不再运行（设置与开机自启动登记仍在，需要一并清掉见下文「彻底卸载」）
 
 ### 自行编译
 
@@ -39,7 +39,7 @@ cargo build --release
 
 - 启动后不会弹窗，图标直接出现在托盘，左键单击打开设置界面
 - 出厂默认只开启「创建文本文档」，「打开记事本」与「开机自启动」默认关闭，需要时在设置界面或托盘菜单里自行打开
-- 彻底卸载：托盘菜单「退出」，删除 exe；如需清理设置，删除注册表项 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，并删除计划任务 `TextDocumentCreator`（`schtasks /Delete /TN TextDocumentCreator /F`）
+- 彻底卸载（连同设置与开机自启动）：托盘菜单「退出」→ 删除 exe → 删除注册表项 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，并删除计划任务 `TextDocumentCreator`（`schtasks /Delete /TN TextDocumentCreator /F`）
 
 ## 使用
 
