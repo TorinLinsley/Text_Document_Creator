@@ -188,6 +188,132 @@ pub fn key_name(vk: u32) -> String {
     name.to_string()
 }
 
+pub fn parse_combo(text: &str) -> (u32, u32) {
+    let mut mods = 0u32;
+    let mut vk = 0u32;
+    let guarded = if text.to_ascii_lowercase().contains("num+") {
+        text.to_ascii_lowercase().replace("num+", "num\u{1}")
+    } else {
+        text.to_string()
+    };
+    for raw in guarded.split('+') {
+        let token = raw.trim().to_ascii_lowercase();
+        if token.is_empty() {
+            continue;
+        }
+        match token.as_str() {
+            "ctrl" | "control" => {
+                mods |= MOD_CONTROL;
+                continue;
+            }
+            "shift" => {
+                mods |= MOD_SHIFT;
+                continue;
+            }
+            "alt" => {
+                mods |= MOD_ALT;
+                continue;
+            }
+            "win" => {
+                mods |= MOD_WIN;
+                continue;
+            }
+            _ => {}
+        }
+        if let Some(value) = key_from_name(&token) {
+            vk = value;
+        }
+    }
+    (vk, mods)
+}
+
+fn key_from_name(token: &str) -> Option<u32> {
+    if token.len() == 1 {
+        let c = token.chars().next()?;
+        if c.is_ascii_lowercase() {
+            return Some(c.to_ascii_uppercase() as u32);
+        }
+        if c.is_ascii_digit() {
+            return Some(c as u32);
+        }
+    }
+    if let Some(rest) = token.strip_prefix('f') {
+        if let Ok(n) = rest.parse::<u32>() {
+            if (1..=24).contains(&n) {
+                return Some(0x6F + n);
+            }
+        }
+    }
+    if let Some(rest) = token.strip_prefix("num") {
+        if rest.len() == 1 {
+            let c = rest.chars().next()?;
+            if let Some(digit) = c.to_digit(10) {
+                return Some(0x60 + digit);
+            }
+        }
+        let vk = match rest {
+            "\u{1}" => 0x6B,
+            "*" => 0x6A,
+            "-" => 0x6D,
+            "." => 0x6E,
+            "/" => 0x6F,
+            _ => return None,
+        };
+        return Some(vk);
+    }
+    let vk = match token {
+        "backspace" => 0x08,
+        "tab" => 0x09,
+        "clear" => 0x0C,
+        "enter" => 0x0D,
+        "pause" => 0x13,
+        "capslock" => 0x14,
+        "escape" | "esc" => 0x1B,
+        "menu" => 0x5D,
+        "space" => 0x20,
+        "pageup" | "pgup" => 0x21,
+        "pagedown" | "pgdn" => 0x22,
+        "end" => 0x23,
+        "home" => 0x24,
+        "left" => 0x25,
+        "up" => 0x26,
+        "right" => 0x27,
+        "down" => 0x28,
+        "printscreen" => 0x2C,
+        "insert" => 0x2D,
+        "delete" | "del" => 0x2E,
+        "numlock" => 0x90,
+        "scrolllock" => 0x91,
+        ";" => 0xBA,
+        "=" => 0xBB,
+        "," => 0xBC,
+        "-" => 0xBD,
+        "." => 0xBE,
+        "/" => 0xBF,
+        "backquote" | "`" => 0xC0,
+        "[" => 0xDB,
+        "backslash" | "\\" => 0xDC,
+        "]" => 0xDD,
+        "'" => 0xDE,
+        "oem102" => 0xE2,
+        "medianext" => 0xB0,
+        "mediaprev" => 0xB1,
+        "mediastop" => 0xB2,
+        "mediaplay" => 0xB3,
+        "volumemute" => 0xAD,
+        "volumedown" => 0xAE,
+        "volumeup" => 0xAF,
+        "browserback" => 0xA6,
+        "browserforward" => 0xA7,
+        "browserrefresh" => 0xA8,
+        "browserstop" => 0xA9,
+        "browsersearch" => 0xAA,
+        "browserfav" => 0xAB,
+        _ => return None,
+    };
+    Some(vk)
+}
+
 pub unsafe fn update(settings: Settings) {
     SETTINGS = Some(settings);
 }

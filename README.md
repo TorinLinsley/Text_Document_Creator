@@ -10,12 +10,13 @@
 
 - **单文件 exe**：静态链接 CRT，只依赖 `user32` / `gdi32` / `dwmapi` / `shell32` / `advapi32` / `uxtheme` / `ole32`，复制到任意 Windows 10/11 机器即可运行
 - **单进程**：没有子进程、没有额外的宿主进程；任务管理器「进程」与「详细信息」里只有一个进程，进程名随系统语言显示
+- **配置即文件**：全部设置存放在 exe 同目录的 `tdc_config.json`，首次运行自动生成出厂配置，删掉这个文件就回到出厂状态
 - **全局快捷键**：默认 `Win+F` 创建文本文档、`Win+J` 打开记事本，包含 `Win` 的组合也能被覆盖
 - **托盘常驻**：启动后只出现在托盘，不弹设置窗口；左键单击托盘打开设置，右键菜单为 设置 / 开机自启动 / 退出
 - **现代化界面**：悬停、按压、下拉展开、开关滑块、主题切换均为动画，且可被打断
 - **20 种界面语言**：启动默认跟随 Windows 系统语言，下拉支持滚轮滚动，手动选择后记住该选择
 - **高 DPI 自适应**：Per-Monitor V2，125% / 150% 下文字清晰；运行中修改缩放或分辨率实时重排
-- **轻量**：exe 约 455 KB；只驻留托盘、未打开设置界面且静止时，专用工作集仅约 **64~84 KB**，打开设置界面后私有内存约 2.5 MB
+- **轻量**：exe 约 508 KB；只驻留托盘、未打开设置界面且静止时，专用工作集仅约 **280 KB**，打开设置界面后私有内存约 1.5 MB
 
 ## 下载安装
 
@@ -39,7 +40,7 @@ cargo build --release
 
 - 启动后不会弹窗，图标直接出现在托盘，左键单击打开设置界面
 - 出厂默认只开启「创建文本文档」，「打开记事本」与「开机自启动」默认关闭，需要时在设置界面或托盘菜单里自行打开
-- 彻底卸载（连同设置与开机自启动）：托盘菜单「退出」→ 删除 exe → 删除注册表项 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，并删除计划任务 `TextDocumentCreator`（`schtasks /Delete /TN TextDocumentCreator /F`）
+- 卸载：见下方「[卸载](#卸载)」
 
 ## 使用
 
@@ -120,11 +121,11 @@ cargo build --release
 
 | 指标                 | 实测                                      |
 | ------------------ | --------------------------------------- |
-| exe 体积             | 约 455 KB                                |
-| 私有内存（PrivateBytes） | 约 2.5 MB                                |
-| 托盘驻留、未打开设置界面（静止）   | 专用工作集约 64~84 KB，提交大小约 1.5 MB            |
+| exe 体积             | 约 508 KB                                |
+| 私有内存（PrivateBytes） | 约 1.5 MB                                |
+| 托盘驻留、未打开设置界面（静止）   | 专用工作集约 280 KB，提交大小约 1.5 MB            |
 | 设置界面打开但静止          | 专用工作集约 0.2 MB（1.5 秒无操作后 trim）           |
-| 重绘峰值               | 约 2.5 MB（1060×620 的 32bpp 兼容位图，每帧创建后释放） |
+| 重绘峰值               | 约 1.5 MB（1060×620 的 32bpp 兼容位图，每帧创建后释放） |
 | 进程数 / 子进程          | 1 / 0                                   |
 | 空闲 CPU             | 0%                                      |
 
@@ -150,11 +151,16 @@ cargo build --release
 | `src/theme.rs` | 深浅色调色板、颜色混合与系统主题判定 |
 | `src/anim.rs` | 指数逼近动画 |
 | `src/i18n.rs` | 20 种语言文案与系统语言检测 |
-| `src/config.rs` | 注册表持久化与开机自启动登记 |
+| `src/config.rs` | JSON 配置读写与开机自启动登记 |
 | `src/hotkey.rs` | 全局键盘钩子、按键绑定、建文件与开记事本 |
 | `src/ffi.rs` / `src/sys.rs` | Win32 常量与 API 声明 |
 
 ## 数据位置
 
-- 设置：`HKEY_CURRENT_USER\Software\TextDocumentCreator`
+- 设置：exe 同目录的 `tdc_config.json`（首次运行时自动写出厂配置，之后每次修改即时写回；也可以直接编辑该文件，重启程序后生效）
 - 开机自启动：计划任务 `\TextDocumentCreator`（`ONLOGON` + 最高权限，登录时静默启动、不弹 UAC；关闭开关会删除该任务）
+
+## 卸载
+
+- **2.1.0 及以后**：托盘菜单「退出」，先关掉「开机自启动」（会删除计划任务），然后删除 exe 和同目录的 `tdc_config.json` 即可，注册表和系统里不留任何设置残留
+- **2.0.0 及更早**：设置写在注册表 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，自启动登记在计划任务 `TextDocumentCreator`（最早的版本写在 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 的 `Text_Document_Creator` 值里）。退出程序后执行 `schtasks /Delete /TN TextDocumentCreator /F`，再用注册表编辑器删除上面两项，才是彻底清除

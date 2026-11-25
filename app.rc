@@ -1,4 +1,4 @@
-#pragma code_page(65001)
+﻿#pragma code_page(65001)
 
 1 ICON "assets/icon.ico"
 1 24 "app.manifest"
@@ -19,12 +19,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Torin Linsley"
             VALUE "FileDescription", "文本文档创建器"
-            VALUE "FileVersion", "2.0.0.0"
+            VALUE "FileVersion", "2.1.0.0"
             VALUE "InternalName", "text_document_creator"
             VALUE "LegalCopyright", "© 2026 Torin Linsley"
             VALUE "OriginalFilename", "text_document_creator.exe"
             VALUE "ProductName", "文本文档创建器"
-            VALUE "ProductVersion", "2.0.0.0"
+            VALUE "ProductVersion", "2.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -49,12 +49,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Torin Linsley"
             VALUE "FileDescription", "文字文件建立器"
-            VALUE "FileVersion", "2.0.0.0"
+            VALUE "FileVersion", "2.1.0.0"
             VALUE "InternalName", "text_document_creator"
             VALUE "LegalCopyright", "© 2026 Torin Linsley"
             VALUE "OriginalFilename", "text_document_creator.exe"
             VALUE "ProductName", "文字文件建立器"
-            VALUE "ProductVersion", "2.0.0.0"
+            VALUE "ProductVersion", "2.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -79,12 +79,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Torin Linsley"
             VALUE "FileDescription", "Text Document Creator"
-            VALUE "FileVersion", "2.0.0.0"
+            VALUE "FileVersion", "2.1.0.0"
             VALUE "InternalName", "text_document_creator"
             VALUE "LegalCopyright", "© 2026 Torin Linsley"
             VALUE "OriginalFilename", "text_document_creator.exe"
             VALUE "ProductName", "Text Document Creator"
-            VALUE "ProductVersion", "2.0.0.0"
+            VALUE "ProductVersion", "2.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -109,12 +109,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Torin Linsley"
             VALUE "FileDescription", "テキスト文書クリエイター"
-            VALUE "FileVersion", "2.0.0.0"
+            VALUE "FileVersion", "2.1.0.0"
             VALUE "InternalName", "text_document_creator"
             VALUE "LegalCopyright", "© 2026 Torin Linsley"
             VALUE "OriginalFilename", "text_document_creator.exe"
             VALUE "ProductName", "テキスト文書クリエイター"
-            VALUE "ProductVersion", "2.0.0.0"
+            VALUE "ProductVersion", "2.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -139,12 +139,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Torin Linsley"
             VALUE "FileDescription", "텍스트 문서 작성기"
-            VALUE "FileVersion", "2.0.0.0"
+            VALUE "FileVersion", "2.1.0.0"
             VALUE "InternalName", "text_document_creator"
             VALUE "LegalCopyright", "© 2026 Torin Linsley"
             VALUE "OriginalFilename", "text_document_creator.exe"
             VALUE "ProductName", "텍스트 문서 작성기"
-            VALUE "ProductVersion", "2.0.0.0"
+            VALUE "ProductVersion", "2.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -169,12 +169,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Torin Linsley"
             VALUE "FileDescription", "Textdokument-Ersteller"
-            VALUE "FileVersion", "2.0.0.0"
+            VALUE "FileVersion", "2.1.0.0"
             VALUE "InternalName", "text_document_creator"
             VALUE "LegalCopyright", "© 2026 Torin Linsley"
             VALUE "OriginalFilename", "text_document_creator.exe"
             VALUE "ProductName", "Textdokument-Ersteller"
-            VALUE "ProductVersion", "2.0.0.0"
+            VALUE "ProductVersion", "2.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -199,12 +199,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Torin Linsley"
             VALUE "FileDescription", "Créateur de documents texte"
-            VALUE "FileVersion", "2.0.0.0"
+            VALUE "FileVersion", "2.1.0.0"
             VALUE "InternalName", "text_document_creator"
             VALUE "LegalCopyright", "© 2026 Torin Linsley"
             VALUE "OriginalFilename", "text_document_creator.exe"
             VALUE "ProductName", "Créateur de documents texte"
-            VALUE "ProductVersion", "2.0.0.0"
+            VALUE "ProductVersion", "2.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -229,12 +229,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Torin Linsley"
             VALUE "FileDescription", "Создатель текстовых документов"
-            VALUE "FileVersion", "2.0.0.0"
+            VALUE "FileVersion", "2.1.0.0"
             VALUE "InternalName", "text_document_creator"
             VALUE "LegalCopyright", "© 2026 Torin Linsley"
             VALUE "OriginalFilename", "text_document_creator.exe"
             VALUE "ProductName", "Создатель текстовых документов"
-            VALUE "ProductVersion", "2.0.0.0"
+            VALUE "ProductVersion", "2.1.0.0"
         END
     END
     BLOCK "VarFileInfo"

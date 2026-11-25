@@ -1407,7 +1407,8 @@ impl App {
         let top = r.y + 24.0;
         let bottom = r.y + r.h - 24.0;
         let line_h = 24.0f32;
-        let lines = wrap(g, t.about_text, inner_w, 14);
+        let about = t.about_text.replace("{v}", env!("CARGO_PKG_VERSION"));
+        let lines = wrap(g, &about, inner_w, 14);
         self.sync_sel_layout(g, &lines, inner_w);
         let total = lines.len() as f32 * line_h;
         self.max_scroll = (total - (bottom - top)).max(0.0);

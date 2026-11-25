@@ -1,6 +1,7 @@
-/// 功能：设置项在注册表中的持久化与开机自启动登记
+/// 功能：设置项以 JSON 文件形式保存在 exe 同目录
 use crate::ffi::*;
 use crate::sys::RegDeleteValueW;
+use std::path::PathBuf;
 
 pub const MOD_ALT: u32 = 1;
 pub const MOD_CONTROL: u32 = 2;
@@ -13,9 +14,12 @@ pub const VK_UP: u32 = 0x26;
 pub const VK_DOWN: u32 = 0x28;
 pub const VK_RETURN: u32 = 0x0D;
 
-const ROOT: &str = "Software\\TextDocumentCreator";
+pub const FILE_NAME: &str = "tdc_config.json";
+
 const RUN_KEY: &str = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
 const RUN_NAME: &str = "Text_Document_Creator";
+const TASK_NAME: &str = "TextDocumentCreator";
+const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 
 #[derive(Clone, Copy)]
 pub struct Settings {
@@ -56,81 +60,103 @@ impl Settings {
     }
 
     pub fn load() -> Settings {
+        let text = match std::fs::read_to_string(config_path()) {
+            Ok(text) => text,
+            Err(_) => {
+                let fresh = Settings::defaults();
+                fresh.save();
+                return fresh;
+            }
+        };
         let mut s = Settings::defaults();
-        s.enable_create = read_dword("EnableCreate", 1) != 0;
-        s.enable_notepad = read_dword("EnableNotepad", 0) != 0;
-        s.autostart = read_dword("AutoStart", 0) != 0;
-        s.vk_create = read_dword("VkCreate", s.vk_create);
-        s.mod_create = read_dword("ModCreate", s.mod_create);
-        s.vk_notepad = read_dword("VkNotepad", s.vk_notepad);
-        s.mod_notepad = read_dword("ModNotepad", s.mod_notepad);
-        s.vk_switch_create = read_dword("VkSwitchCreate", 0);
-        s.mod_switch_create = read_dword("ModSwitchCreate", 0);
-        s.vk_switch_notepad = read_dword("VkSwitchNotepad", 0);
-        s.mod_switch_notepad = read_dword("ModSwitchNotepad", 0);
-        s.language_auto = read_dword("LanguageAuto", 1) != 0;
-        let language = read_dword("Language", 0xFFFF_FFFF);
-        if (language as usize) < crate::i18n::COUNT {
-            s.language = language as usize;
+        if let Some(value) = field(&text, "enable_create") {
+            s.enable_create = value == "true";
+        }
+        if let Some(value) = field(&text, "enable_notepad") {
+            s.enable_notepad = value == "true";
+        }
+        if let Some(value) = field(&text, "autostart") {
+            s.autostart = value == "true";
+        }
+        if let Some(value) = field(&text, "language_auto") {
+            s.language_auto = value == "true";
+        }
+        if let Some(value) = number(&text, "language") {
+            if (value as usize) < crate::i18n::COUNT {
+                s.language = value as usize;
+            }
+        }
+        if let Some(value) = number(&text, "theme") {
+            if value <= 2 {
+                s.theme_mode = value;
+            }
+        }
+        if let Some(value) = field(&text, "hotkey_create") {
+            let (vk, mods) = crate::hotkey::parse_combo(&value);
+            if vk != 0 {
+                s.vk_create = vk;
+                s.mod_create = mods;
+            }
+        }
+        if let Some(value) = field(&text, "hotkey_notepad") {
+            let (vk, mods) = crate::hotkey::parse_combo(&value);
+            if vk != 0 {
+                s.vk_notepad = vk;
+                s.mod_notepad = mods;
+            }
+        }
+        if let Some(value) = field(&text, "hotkey_toggle_create") {
+            let (vk, mods) = crate::hotkey::parse_combo(&value);
+            s.vk_switch_create = vk;
+            s.mod_switch_create = mods;
+        }
+        if let Some(value) = field(&text, "hotkey_toggle_notepad") {
+            let (vk, mods) = crate::hotkey::parse_combo(&value);
+            s.vk_switch_notepad = vk;
+            s.mod_switch_notepad = mods;
         }
         if s.language_auto {
             s.language = crate::i18n::detect();
-        }
-        let mode = read_dword("ThemeMode", 0xFFFF_FFFF);
-        if mode <= 2 {
-            s.theme_mode = mode;
         }
         s
     }
 
     pub fn save(&self) {
-        let pairs: [(&str, u32); 14] = [
-            ("EnableCreate", self.enable_create as u32),
-            ("EnableNotepad", self.enable_notepad as u32),
-            ("AutoStart", self.autostart as u32),
-            ("VkCreate", self.vk_create),
-            ("ModCreate", self.mod_create),
-            ("VkNotepad", self.vk_notepad),
-            ("ModNotepad", self.mod_notepad),
-            ("VkSwitchCreate", self.vk_switch_create),
-            ("ModSwitchCreate", self.mod_switch_create),
-            ("VkSwitchNotepad", self.vk_switch_notepad),
-            ("ModSwitchNotepad", self.mod_switch_notepad),
-            ("Language", self.language as u32),
-            ("LanguageAuto", self.language_auto as u32),
-            ("ThemeMode", self.theme_mode),
-        ];
-        unsafe {
-            let sub = w(ROOT);
-            let mut key: HKEY = 0;
-            if RegCreateKeyExW(HKEY_CURRENT_USER, sub.as_ptr(), 0, core::ptr::null(), 0, KEY_QUERY_VALUE | KEY_SET_VALUE, core::ptr::null_mut(), &mut key, core::ptr::null_mut()) != 0 {
-                return;
-            }
-            for (name, value) in pairs.iter() {
-                let n = w(name);
-                RegSetValueExW(key, n.as_ptr(), 0, REG_DWORD, value as *const u32 as *const u8, 4);
-            }
-            RegCloseKey(key);
+        let text = format!(
+            "{{\n  \"version\": 1,\n  \"enable_create\": {},\n  \"enable_notepad\": {},\n  \"autostart\": {},\n  \"language_auto\": {},\n  \"language\": {},\n  \"theme\": {},\n  \"hotkey_create\": \"{}\",\n  \"hotkey_notepad\": \"{}\",\n  \"hotkey_toggle_create\": \"{}\",\n  \"hotkey_toggle_notepad\": \"{}\"\n}}\n",
+            self.enable_create,
+            self.enable_notepad,
+            self.autostart,
+            self.language_auto,
+            self.language,
+            self.theme_mode,
+            crate::hotkey::shortcut_text(self.vk_create, self.mod_create),
+            crate::hotkey::shortcut_text(self.vk_notepad, self.mod_notepad),
+            crate::hotkey::shortcut_text(self.vk_switch_create, self.mod_switch_create),
+            crate::hotkey::shortcut_text(self.vk_switch_notepad, self.mod_switch_notepad),
+        );
+        let path = config_path();
+        let temp = path.with_extension("json.tmp");
+        if std::fs::write(&temp, text.as_bytes()).is_ok() {
+            let _ = std::fs::rename(&temp, &path);
         }
     }
 
     pub fn apply_autostart(&self) {
         let exe = std::env::current_exe().map(|p| p.to_string_lossy().to_string()).unwrap_or_default();
         unsafe {
-        if self.autostart {
-            let args = format!("/Create /TN \"{}\" /TR \"\\\"{}\\\"\" /SC ONLOGON /RL HIGHEST /F", TASK_NAME, exe);
-            if !task_tool(&args) {
-                write_run_value(&exe);
+            if self.autostart {
+                let args = format!("/Create /TN \"{}\" /TR \"\\\"{}\\\"\" /SC ONLOGON /RL HIGHEST /F", TASK_NAME, exe);
+                if !task_tool(&args) {
+                    write_run_value(&exe);
+                }
+            } else {
+                task_tool(&format!("/Delete /TN \"{}\" /F", TASK_NAME));
             }
-        } else {
-            task_tool(&format!("/Delete /TN \"{}\" /F", TASK_NAME));
-        }
-        remove_run_value();
+            remove_run_value();
         }
     }
-}
 
-impl Settings {
     pub fn reconcile_autostart(&self) {
         if self.autostart != autostart_registered() {
             self.apply_autostart();
@@ -138,12 +164,58 @@ impl Settings {
     }
 }
 
+pub fn config_path() -> PathBuf {
+    match std::env::current_exe() {
+        Ok(exe) => match exe.parent() {
+            Some(dir) => dir.join(FILE_NAME),
+            None => PathBuf::from(FILE_NAME),
+        },
+        Err(_) => PathBuf::from(FILE_NAME),
+    }
+}
+
 pub fn startup_sync() {
     Settings::load().reconcile_autostart();
 }
 
-const TASK_NAME: &str = "TextDocumentCreator";
-const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+fn field(text: &str, key: &str) -> Option<String> {
+    let needle = format!("\"{}\"", key);
+    let start = text.find(&needle)? + needle.len();
+    let rest = &text[start..];
+    let colon = rest.find(':')?;
+    let mut chars = rest[colon + 1..].chars().peekable();
+    loop {
+        match chars.next() {
+            Some(c) if c.is_whitespace() => continue,
+            Some('"') => {
+                let mut value = String::new();
+                for c in chars.by_ref() {
+                    if c == '"' {
+                        break;
+                    }
+                    value.push(c);
+                }
+                return Some(value);
+            }
+            Some(c) => {
+                let mut value = String::new();
+                value.push(c);
+                for c in chars.by_ref() {
+                    if c == ',' || c == '\n' || c == '}' {
+                        break;
+                    }
+                    value.push(c);
+                }
+                return Some(value.trim().to_string());
+            }
+            None => return None,
+        }
+    }
+}
+
+fn number(text: &str, key: &str) -> Option<u32> {
+    field(text, key)?.parse::<u32>().ok()
+}
 
 unsafe fn task_tool(args: &str) -> bool {
     let mut info: crate::sys::STARTUPINFOW = core::mem::zeroed();
@@ -191,42 +263,6 @@ unsafe fn remove_run_value() {
     RegCloseKey(key);
 }
 
-fn legacy_run_present() -> bool {
-    unsafe {
-        let sub = w(RUN_KEY);
-        let mut key: HKEY = 0;
-        if RegOpenKeyExW(HKEY_CURRENT_USER, sub.as_ptr(), 0, KEY_QUERY_VALUE, &mut key) != 0 {
-            return false;
-        }
-        let name = w(RUN_NAME);
-        let mut size: u32 = 0;
-        let mut kind: u32 = 0;
-        let status = RegQueryValueExW(key, name.as_ptr(), core::ptr::null_mut(), &mut kind, core::ptr::null_mut(), &mut size);
-        RegCloseKey(key);
-        status == 0 && size > 0
-    }
-}
-
 fn autostart_registered() -> bool {
-    unsafe { task_present() || legacy_run_present() }
-}
-
-fn read_dword(name: &str, fallback: u32) -> u32 {
-    unsafe {
-        let sub = w(ROOT);
-        let mut key: HKEY = 0;
-        if RegOpenKeyExW(HKEY_CURRENT_USER, sub.as_ptr(), 0, KEY_QUERY_VALUE, &mut key) != 0 {
-            return fallback;
-        }
-        let n = w(name);
-        let mut value: u32 = fallback;
-        let mut size: u32 = 4;
-        let mut kind: u32 = 0;
-        let status = RegQueryValueExW(key, n.as_ptr(), core::ptr::null_mut(), &mut kind, &mut value as *mut u32 as *mut u8, &mut size);
-        RegCloseKey(key);
-        if status != 0 || kind != REG_DWORD {
-            return fallback;
-        }
-        value
-    }
+    unsafe { task_present() }
 }

@@ -10,12 +10,13 @@
 
 - **單一 exe**：靜態連結 CRT，只依賴 `user32` / `gdi32` / `dwmapi` / `shell32` / `advapi32` / `uxtheme` / `ole32`，複製到任意 Windows 10/11 電腦即可執行
 - **單一處理序**：沒有子處理序、沒有額外的裝載處理序；工作管理員「處理程序」與「詳細資料」中都只有一個項目，名稱隨系統語言顯示
+- **設定即檔案**：所有設定存放在 exe 同目錄的 `tdc_config.json`，首次執行自動產生出廠設定，刪除這個檔案就回到出廠狀態
 - **全域快速鍵**：預設 `Win+F` 建立文字文件、`Win+J` 開啟記事本，含 `Win` 的組合也能被覆蓋
 - **匣盤常駐**：啟動後只出現在匣盤，不彈出設定視窗；左鍵單擊開設定，右鍵選單為 設定 / 開機自動啟動 / 結束
 - **現代化介面**：滑鼠移入、按下、下拉展開、開關滑塊、主題切換皆有動畫，且可被中斷
 - **20 種介面語言**：啟動時預設跟隨 Windows 系統語言，下拉支援滾輪捲動，手動選擇後會記住該選擇
 - **高 DPI 自適應**：Per-Monitor V2，125% / 150% 下文字清晰；執行中變更縮放或解析度會即時重排
-- **輕量**：exe 約 455 KB；只常駐匣盤、未開啟設定介面且靜止時，專用工作集僅約 **64~84 KB**，開啟設定介面後私有記憶體約 2.5 MB
+- **輕量**：exe 約 508 KB；只常駐匣盤、未開啟設定介面且靜止時，專用工作集僅約 **280 KB**，開啟設定介面後私有記憶體約 1.5 MB
 
 ## 下載與安裝
 
@@ -39,7 +40,7 @@ cargo build --release
 
 - 啟動後不會彈窗，圖示直接出現在匣盤，左鍵單擊開啟設定介面
 - 需要開機自動啟動時，在設定介面或匣盤選單中開啟「開機自動啟動」
-- 徹底解除安裝（連同設定與開機自動啟動）：匣盤選單「結束」→ 刪除 exe → 刪除登錄檔項目 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，並刪除排程工作 `TextDocumentCreator`（`schtasks /Delete /TN TextDocumentCreator /F`）
+- 解除安裝：見下方「[解除安裝](#解除安裝)」
 
 ## 使用
 
@@ -120,11 +121,11 @@ cargo build --release
 
 | 指標                  | 實測                                       |
 | ------------------- | ---------------------------------------- |
-| exe 大小              | 約 455 KB                                 |
-| 私有記憶體（PrivateBytes） | 約 2.5 MB                                 |
-| 匣盤常駐、未開啟設定介面（靜止）    | 專用工作集約 64~84 KB，提交大小約 1.5 MB             |
+| exe 大小              | 約 508 KB                                 |
+| 私有記憶體（PrivateBytes） | 約 1.5 MB                                 |
+| 匣盤常駐、未開啟設定介面（靜止）    | 專用工作集約 280 KB，提交大小約 1.5 MB             |
 | 設定介面開啟但靜止           | 專用工作集約 0.2 MB（1.5 秒無操作後 trim）            |
-| 重繪峰值                | 約 2.5 MB（1060×620 的 32bpp 相容點陣圖，每幀建立後釋放） |
+| 重繪峰值                | 約 1.5 MB（1060×620 的 32bpp 相容點陣圖，每幀建立後釋放） |
 | 處理序數 / 子處理序         | 1 / 0                                    |
 | 閒置 CPU              | 0%                                       |
 
@@ -150,11 +151,17 @@ cargo build --release
 | `src/theme.rs` | 深淺色調色盤、顏色混合與系統主題判定 |
 | `src/anim.rs` | 指數趨近動畫 |
 | `src/i18n.rs` | 20 種語言文案與系統語言偵測 |
-| `src/config.rs` | 登錄檔持久化與開機自動啟動登記 |
+| `src/config.rs` | JSON 設定檔讀寫與開機自動啟動登記 |
 | `src/hotkey.rs` | 全域鍵盤鉤子、按鍵綁定、建檔案與開記事本 |
 | `src/ffi.rs` / `src/sys.rs` | Win32 常數與 API 宣告 |
 
 ## 資料位置
 
-- 設定：`HKEY_CURRENT_USER\Software\TextDocumentCreator`
+- 設定：exe 同目錄的 `tdc_config.json`（首次執行時寫出出廠設定，之後每次修改即時寫回；也可以直接編輯這個檔案，重新啟動程式後生效）
+- 舊版說明：2.0.0 及更早的版本把同樣的設定放在登錄檔 `HKEY_CURRENT_USER\Software\TextDocumentCreator`
 - 開機自動啟動：排程工作 `\TextDocumentCreator`（`ONLOGON` + 最高權限，登入時靜默啟動、不彈 UAC；關閉開關會刪除該工作）
+
+## 解除安裝
+
+- **2.1.0 及之後**：匣盤選單「結束」，先關閉「開機自動啟動」（會刪除排程工作），再刪除 exe 與同目錄的 `tdc_config.json`，登錄檔與系統中不會留下任何設定殘留
+- **2.0.0 及更早**：設定寫在登錄檔 `HKEY_CURRENT_USER\Software\TextDocumentCreator`，開機自動啟動登記為排程工作 `TextDocumentCreator`（最早的版本寫在 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 的 `Text_Document_Creator` 值）。結束程式後執行 `schtasks /Delete /TN TextDocumentCreator /F`，再用登錄編輯器刪除上述兩項，才算徹底清除

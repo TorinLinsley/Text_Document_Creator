@@ -10,12 +10,13 @@ The settings window is not assembled from stock controls but drawn from scratch:
 
 - **Single exe**: statically linked CRT, only depends on `user32` / `gdi32` / `dwmapi` / `shell32` / `advapi32` / `uxtheme` / `ole32`, so it runs from any Windows 10/11 machine as-is
 - **Single process**: no child processes and no host process; one entry in both the Processes and Details tabs of Task Manager, with a display name that follows the system language
+- **Settings are just a file**: everything lives in `tdc_config.json` next to the exe, written on first run and updated on every change, so deleting that one file restores the factory state
 - **Global hotkeys**: `Win+F` creates a text document and `Win+J` opens Notepad by default; combinations that include `Win` are overridden as well
 - **Tray resident**: starts silently in the tray without showing a window; left click opens the settings, right click shows Settings / Run at startup / Exit
 - **Modern UI**: hover, press, dropdown, toggle and theme transitions are all animated and interruptible
 - **20 UI languages**: follows the Windows system language on startup, the dropdown scrolls with the wheel and a manual choice is remembered
 - **High DPI aware**: Per-Monitor V2, crisp text at 125% / 150%, live reflow when scaling or resolution changes
-- **Lightweight**: about 455 KB exe; sitting in the tray with no settings window open and nothing happening costs about **64~84 KB** of private working set, and about 2.5 MB private memory once the settings window is open
+- **Lightweight**: about 508 KB exe; sitting in the tray with no settings window open and nothing happening costs about **280 KB** of private working set, and about 1.5 MB private memory once the settings window is open
 
 ## Download and install
 
@@ -39,7 +40,7 @@ This needs the Rust toolchain (MSVC target) and the Windows SDK; the output is `
 
 - No window appears on startup: the icon simply shows up in the tray, and a left click opens the settings
 - Out of the box only "Create text file" is enabled; "Open Notepad" and "Run at startup" are off until you turn them on in the settings or the tray menu
-- To uninstall completely (settings and startup included): choose Exit in the tray menu, delete the exe, then delete the registry key `HKEY_CURRENT_USER\Software\TextDocumentCreator` and remove the `TextDocumentCreator` scheduled task (`schtasks /Delete /TN TextDocumentCreator /F`)
+- To uninstall: see [Uninstall](#uninstall)
 
 ## Usage
 
@@ -120,11 +121,11 @@ The program is one Win32 window, one tray icon and one global hook. It spawns no
 
 | Metric                                | Measured                                                                           |
 | ------------------------------------- | ---------------------------------------------------------------------------------- |
-| exe size                              | about 455 KB                                                                       |
-| Private bytes                         | about 2.5 MB                                                                       |
-| Tray resident, settings closed (idle) | about 64~84 KB private working set, about 1.5 MB commit                            |
+| exe size                              | about 508 KB                                                                       |
+| Private bytes                         | about 1.5 MB                                                                       |
+| Tray resident, settings closed (idle) | about 280 KB private working set, about 1.5 MB commit                            |
 | Settings open but idle                | about 0.2 MB private working set (trimmed 1.5 s after the last input)              |
-| Repaint peak                          | about 2.5 MB (a 1060x620 32 bpp compatible bitmap, created and released per frame) |
+| Repaint peak                          | about 1.5 MB (a 1060x620 32 bpp compatible bitmap, created and released per frame) |
 | Processes / child processes           | 1 / 0                                                                              |
 | Idle CPU                              | 0%                                                                                 |
 
@@ -150,11 +151,17 @@ Output: `target\release\text_document_creator.exe`
 | `src/theme.rs` | Dark and light palettes, colour blending and system theme detection |
 | `src/anim.rs` | Exponential-approach animation |
 | `src/i18n.rs` | Text for 20 languages and system language detection |
-| `src/config.rs` | Registry persistence and run-at-startup registration |
+| `src/config.rs` | JSON settings file and run-at-startup registration |
 | `src/hotkey.rs` | Global hook, key binding, file creation and Notepad launch |
 | `src/ffi.rs` / `src/sys.rs` | Win32 constants and API declarations |
 
 ## Data locations
 
-- Settings: `HKEY_CURRENT_USER\Software\TextDocumentCreator`
+- Settings: `tdc_config.json` next to the exe (written with factory values on first run, rewritten on every change; you can also edit it by hand and restart the app)
+- Legacy note: versions 2.0.0 and earlier kept the same settings in `HKEY_CURRENT_USER\Software\TextDocumentCreator`
 - Run at startup: the `\TextDocumentCreator` scheduled task (`ONLOGON` with highest privileges, so logon is silent and shows no UAC prompt; turning the switch off deletes it)
+
+## Uninstall
+
+- **2.1.0 and later**: choose Exit in the tray menu, turn "Run at startup" off first (that removes the scheduled task), then delete the exe and `tdc_config.json` in the same folder. Nothing is left in the registry or anywhere else.
+- **2.0.0 and earlier**: settings lived in the registry key `HKEY_CURRENT_USER\Software\TextDocumentCreator`, and startup was registered as the `TextDocumentCreator` scheduled task (the very first builds used the `Text_Document_Creator` value under `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run`). Exit the app, run `schtasks /Delete /TN TextDocumentCreator /F`, then delete those registry entries to clean up completely.
