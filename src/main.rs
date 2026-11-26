@@ -28,6 +28,8 @@ const MIN_H: f32 = 520.0;
 
 static mut QUIT: bool = false;
 
+static mut TASKBAR_MSG: u32 = 0;
+
 fn main() {
     unsafe {
         run();
@@ -36,6 +38,8 @@ fn main() {
 
 unsafe fn run() {
     SetProcessDpiAwarenessContext(-4);
+    let taskbar = w("TaskbarCreated");
+    TASKBAR_MSG = RegisterWindowMessageW(taskbar.as_ptr());
     let instance = GetModuleHandleW(core::ptr::null());
     let mutex_name = w("Local\\TextDocumentCreatorSettings");
     let mutex = CreateMutexW(core::ptr::null_mut(), 0, mutex_name.as_ptr());
@@ -285,7 +289,7 @@ unsafe fn tray_menu(hwnd: HWND) {
     }
 }
 
-unsafe fn add_tray(hwnd: HWND, instance: HINSTANCE) {
+unsafe fn add_tray(hwnd: HWND, instance: HINSTANCE) -> bool {
     let mut data: NOTIFYICONDATAW = core::mem::zeroed();
     data.cbSize = core::mem::size_of::<NOTIFYICONDATAW>() as u32;
     data.hWnd = hwnd;
@@ -295,7 +299,7 @@ unsafe fn add_tray(hwnd: HWND, instance: HINSTANCE) {
     data.hIcon = LoadImageW(instance, 1 as *const u16, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
     let tip: Vec<u16> = "Text Document Creator".encode_utf16().collect();
     data.szTip[..tip.len().min(127)].copy_from_slice(&tip[..tip.len().min(127)]);
-    Shell_NotifyIconW(NIM_ADD, &mut data);
+    Shell_NotifyIconW(NIM_ADD, &mut data) != 0
 }
 
 unsafe fn remove_tray(hwnd: HWND) {
@@ -312,7 +316,10 @@ unsafe extern "system" fn wnd_proc(hwnd: HWND, msg: u32, wp: WPARAM, lp: LPARAM)
             let instance = GetModuleHandleW(core::ptr::null());
             let state = Box::into_raw(Box::new(App::new(hwnd, instance)));
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, state as isize);
-            add_tray(hwnd, instance);
+            if !add_tray(hwnd, instance) {
+                SetTimer(hwnd, 3, 400, 0);
+            }
+            SetTimer(hwnd, 4, 5000, 0);
             hotkey::install(hwnd);
             if let Some(state) = app_of(hwnd) {
                 hotkey::update(state.settings);
@@ -320,6 +327,13 @@ unsafe extern "system" fn wnd_proc(hwnd: HWND, msg: u32, wp: WPARAM, lp: LPARAM)
                 SetWindowTextW(hwnd, title.as_ptr());
             }
             return 1;
+        }
+        msg if msg == TASKBAR_MSG && TASKBAR_MSG != 0 => {
+            let instance = GetModuleHandleW(core::ptr::null());
+            if !add_tray(hwnd, instance) {
+                SetTimer(hwnd, 3, 400, 0);
+            }
+            0
         }
         WM_NCCALCSIZE => {
             if wp != 0 {
@@ -398,6 +412,18 @@ unsafe extern "system" fn wnd_proc(hwnd: HWND, msg: u32, wp: WPARAM, lp: LPARAM)
             0
         }
         WM_TIMER => {
+            if wp == 3 {
+                let instance = GetModuleHandleW(core::ptr::null());
+                if add_tray(hwnd, instance) {
+                    KillTimer(hwnd, 3);
+                }
+                return 0;
+            }
+            if wp == 4 {
+                let instance = GetModuleHandleW(core::ptr::null());
+                add_tray(hwnd, instance);
+                return 0;
+            }
             let mut alive = false;
             if let Some(state) = app_of(hwnd) {
                 alive = state.on_timer();

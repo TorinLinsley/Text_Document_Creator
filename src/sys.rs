@@ -177,6 +177,7 @@ pub unsafe fn vtable_entry(ptr: *mut c_void, index: usize) -> usize {
 #[link(name = "user32")]
 unsafe extern "system" {
     pub fn Shell_NotifyIconW(op: u32, data: *mut NOTIFYICONDATAW) -> i32;
+    pub fn RegisterWindowMessageW(name: *const u16) -> u32;
     pub fn CreatePopupMenu() -> HMENU;
     pub fn AppendMenuW(menu: HMENU, flags: u32, id: usize, text: *const u16) -> i32;
     pub fn TrackPopupMenu(menu: HMENU, flags: u32, x: i32, y: i32, reserved: i32, hwnd: HWND, rect: *const RECT) -> i32;
