@@ -24,7 +24,7 @@ The settings window is not assembled from stock controls but drawn from scratch:
 
 #### Download the exe
 
-1. Open [Releases](https://github.com/TorinLinsley/Text_Document_Creator/releases) and download the latest `text_document_creator_版本号.exe`
+1. Open [Releases](https://github.com/TorinLinsley/Text_Document_Creator/releases) and download the latest `text_document_creator_v{Version}.exe`
 2. Put it in any folder (for example `D:\Tools\TextDocumentCreator`) and double click it
 3. Nothing to install, no .NET or VC++ runtime required
 
