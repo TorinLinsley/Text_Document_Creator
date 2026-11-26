@@ -36,7 +36,7 @@ cd Text_Document_Creator
 cargo build --release
 ```
 
-需要 Rust 工具链（MSVC 目标）与 Windows SDK，产物为 `target\release\text_document_creator_版本号.exe`。
+需要 Rust 工具链（MSVC 目标）与 Windows SDK，产物为 `target\release\text_document_creator.exe`。
 
 #### 首次运行
 
