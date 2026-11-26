@@ -122,7 +122,7 @@ impl Settings {
 
     pub fn save(&self) {
         let text = format!(
-            "{{\n  \"version\": 1,\n  \"enable_create\": {},\n  \"enable_notepad\": {},\n  \"autostart\": {},\n  \"language\": \"{}\",\n  \"theme\": {},\n  \"hotkey_create\": \"{}\",\n  \"hotkey_notepad\": \"{}\",\n  \"hotkey_toggle_create\": \"{}\",\n  \"hotkey_toggle_notepad\": \"{}\"\n}}\n",
+            "{{\n    \"version\": 1,\n    \"enable_create\": {},\n    \"enable_notepad\": {},\n    \"autostart\": {},\n    \"language\": \"{}\",\n    \"theme\": {},\n    \"hotkey_create\": \"{}\",\n    \"hotkey_notepad\": \"{}\",\n    \"hotkey_toggle_create\": \"{}\",\n    \"hotkey_toggle_notepad\": \"{}\"\n}}\n",
             self.enable_create,
             self.enable_notepad,
             self.autostart,
